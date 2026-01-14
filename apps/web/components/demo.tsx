@@ -1,9 +1,11 @@
 "use client";
 
-import React, { useEffect, useState, useCallback, useRef } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Renderer, useUIStream, JSONUIProvider } from "@json-render/react";
 import type { UITree } from "@json-render/core";
+import { toast } from "sonner";
 import { CodeBlock } from "./code-block";
+import { Toaster } from "./ui/sonner";
 import { demoRegistry, fallbackComponent, useInteractiveState } from "./demo/index";
 
 const SIMULATION_PROMPT = "Create a contact form with name, email, and message";
@@ -65,7 +67,6 @@ export function Demo() {
   const [stageIndex, setStageIndex] = useState(-1);
   const [streamLines, setStreamLines] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState<Tab>("json");
-  const [actionFired, setActionFired] = useState(false);
   const [simulationTree, setSimulationTree] = useState<UITree | null>(null);
 
   // Use the library's useUIStream hook for real API calls
@@ -84,8 +85,10 @@ export function Demo() {
 
   const currentSimulationStage = stageIndex >= 0 ? SIMULATION_STAGES[stageIndex] : null;
 
-  // Determine which tree to display
-  const currentTree = mode === "simulation" ? (currentSimulationStage?.tree || simulationTree) : apiTree;
+  // Determine which tree to display - keep simulation tree until new API response
+  const currentTree = mode === "simulation" 
+    ? (currentSimulationStage?.tree || simulationTree) 
+    : (apiTree || simulationTree);
 
   const stopGeneration = useCallback(() => {
     if (mode === "simulation") {
@@ -165,14 +168,13 @@ export function Demo() {
     await send(userPrompt);
   }, [userPrompt, isStreaming, send]);
 
-  // Expose action handler for registry components
+  // Expose action handler for registry components - shows toast with text
   useEffect(() => {
-    (window as unknown as { __demoAction?: () => void }).__demoAction = () => {
-      setActionFired(true);
-      setTimeout(() => setActionFired(false), 2000);
+    (window as unknown as { __demoAction?: (text: string) => void }).__demoAction = (text: string) => {
+      toast(text);
     };
     return () => {
-      delete (window as unknown as { __demoAction?: () => void }).__demoAction;
+      delete (window as unknown as { __demoAction?: (text: string) => void }).__demoAction;
     };
   }, []);
 
@@ -321,11 +323,6 @@ export function Demo() {
                       fallback={fallbackComponent as Parameters<typeof Renderer>[0]['fallback']}
                     />
                   </JSONUIProvider>
-                  {actionFired && (
-                    <div className="mt-3 text-xs font-mono text-muted-foreground text-center animate-in fade-in slide-in-from-bottom-2">
-                      onAction()
-                    </div>
-                  )}
                 </div>
               </div>
             ) : (
@@ -334,6 +331,7 @@ export function Demo() {
               </div>
             )}
           </div>
+          <Toaster position="bottom-right" />
         </div>
       </div>
     </div>

@@ -6,6 +6,7 @@ export { useInteractiveState } from "./utils";
 export { Alert } from "./alert";
 export { Avatar } from "./avatar";
 export { Badge } from "./badge";
+export { BarGraph } from "./bar-graph";
 export { Button } from "./button";
 export { Card } from "./card";
 export { Checkbox } from "./checkbox";
@@ -16,6 +17,7 @@ export { Grid } from "./grid";
 export { Heading } from "./heading";
 export { Image } from "./image";
 export { Input } from "./input";
+export { LineGraph } from "./line-graph";
 export { Link } from "./link";
 export { Progress } from "./progress";
 export { Radio } from "./radio";
@@ -30,6 +32,7 @@ import type { ComponentRegistry } from "./types";
 import { Alert } from "./alert";
 import { Avatar } from "./avatar";
 import { Badge } from "./badge";
+import { BarGraph } from "./bar-graph";
 import { Button } from "./button";
 import { Card } from "./card";
 import { Checkbox } from "./checkbox";
@@ -40,6 +43,7 @@ import { Grid } from "./grid";
 import { Heading } from "./heading";
 import { Image } from "./image";
 import { Input } from "./input";
+import { LineGraph } from "./line-graph";
 import { Link } from "./link";
 import { Progress } from "./progress";
 import { Radio } from "./radio";
@@ -54,6 +58,7 @@ export const demoRegistry: ComponentRegistry = {
   Alert,
   Avatar,
   Badge,
+  BarGraph,
   Button,
   Card,
   Checkbox,
@@ -63,6 +68,7 @@ export const demoRegistry: ComponentRegistry = {
   Heading,
   Image,
   Input,
+  LineGraph,
   Link,
   Progress,
   Radio,

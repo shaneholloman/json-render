@@ -17,7 +17,9 @@ export function Alert({ element }: ComponentRenderProps) {
           : "bg-blue-50 border-blue-200";
 
   return (
-    <div className={`p-2 rounded border ${alertClass} ${baseClass} ${customClass}`}>
+    <div
+      className={`p-2 rounded border ${alertClass} ${baseClass} ${customClass}`}
+    >
       <div className="text-xs font-medium">{props.title as string}</div>
       {props.message ? (
         <div className="text-[10px] mt-0.5">{props.message as string}</div>

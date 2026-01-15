@@ -6,7 +6,11 @@ import type { UITree } from "@json-render/core";
 import { toast } from "sonner";
 import { CodeBlock } from "./code-block";
 import { Toaster } from "./ui/sonner";
-import { demoRegistry, fallbackComponent, useInteractiveState } from "./demo/index";
+import {
+  demoRegistry,
+  fallbackComponent,
+  useInteractiveState,
+} from "./demo/index";
 
 const SIMULATION_PROMPT = "Create a contact form with name, email, and message";
 
@@ -17,24 +21,128 @@ interface SimulationStage {
 
 const SIMULATION_STAGES: SimulationStage[] = [
   {
-    tree: { root: "card", elements: { card: { key: "card", type: "Card", props: { title: "Contact Us", maxWidth: "md" }, children: [] } } },
+    tree: {
+      root: "card",
+      elements: {
+        card: {
+          key: "card",
+          type: "Card",
+          props: { title: "Contact Us", maxWidth: "md" },
+          children: [],
+        },
+      },
+    },
     stream: '{"op":"set","path":"/root","value":"card"}',
   },
   {
-    tree: { root: "card", elements: { card: { key: "card", type: "Card", props: { title: "Contact Us", maxWidth: "md" }, children: ["name"] }, name: { key: "name", type: "Input", props: { label: "Name", name: "name" } } } },
-    stream: '{"op":"add","path":"/elements/card","value":{"key":"card","type":"Card","props":{"title":"Contact Us","maxWidth":"md"},"children":["name"]}}',
+    tree: {
+      root: "card",
+      elements: {
+        card: {
+          key: "card",
+          type: "Card",
+          props: { title: "Contact Us", maxWidth: "md" },
+          children: ["name"],
+        },
+        name: {
+          key: "name",
+          type: "Input",
+          props: { label: "Name", name: "name" },
+        },
+      },
+    },
+    stream:
+      '{"op":"add","path":"/elements/card","value":{"key":"card","type":"Card","props":{"title":"Contact Us","maxWidth":"md"},"children":["name"]}}',
   },
   {
-    tree: { root: "card", elements: { card: { key: "card", type: "Card", props: { title: "Contact Us", maxWidth: "md" }, children: ["name", "email"] }, name: { key: "name", type: "Input", props: { label: "Name", name: "name" } }, email: { key: "email", type: "Input", props: { label: "Email", name: "email" } } } },
-    stream: '{"op":"add","path":"/elements/email","value":{"key":"email","type":"Input","props":{"label":"Email","name":"email"}}}',
+    tree: {
+      root: "card",
+      elements: {
+        card: {
+          key: "card",
+          type: "Card",
+          props: { title: "Contact Us", maxWidth: "md" },
+          children: ["name", "email"],
+        },
+        name: {
+          key: "name",
+          type: "Input",
+          props: { label: "Name", name: "name" },
+        },
+        email: {
+          key: "email",
+          type: "Input",
+          props: { label: "Email", name: "email" },
+        },
+      },
+    },
+    stream:
+      '{"op":"add","path":"/elements/email","value":{"key":"email","type":"Input","props":{"label":"Email","name":"email"}}}',
   },
   {
-    tree: { root: "card", elements: { card: { key: "card", type: "Card", props: { title: "Contact Us", maxWidth: "md" }, children: ["name", "email", "message"] }, name: { key: "name", type: "Input", props: { label: "Name", name: "name" } }, email: { key: "email", type: "Input", props: { label: "Email", name: "email" } }, message: { key: "message", type: "Textarea", props: { label: "Message", name: "message" } } } },
-    stream: '{"op":"add","path":"/elements/message","value":{"key":"message","type":"Textarea","props":{"label":"Message","name":"message"}}}',
+    tree: {
+      root: "card",
+      elements: {
+        card: {
+          key: "card",
+          type: "Card",
+          props: { title: "Contact Us", maxWidth: "md" },
+          children: ["name", "email", "message"],
+        },
+        name: {
+          key: "name",
+          type: "Input",
+          props: { label: "Name", name: "name" },
+        },
+        email: {
+          key: "email",
+          type: "Input",
+          props: { label: "Email", name: "email" },
+        },
+        message: {
+          key: "message",
+          type: "Textarea",
+          props: { label: "Message", name: "message" },
+        },
+      },
+    },
+    stream:
+      '{"op":"add","path":"/elements/message","value":{"key":"message","type":"Textarea","props":{"label":"Message","name":"message"}}}',
   },
   {
-    tree: { root: "card", elements: { card: { key: "card", type: "Card", props: { title: "Contact Us", maxWidth: "md" }, children: ["name", "email", "message", "submit"] }, name: { key: "name", type: "Input", props: { label: "Name", name: "name" } }, email: { key: "email", type: "Input", props: { label: "Email", name: "email" } }, message: { key: "message", type: "Textarea", props: { label: "Message", name: "message" } }, submit: { key: "submit", type: "Button", props: { label: "Send Message", variant: "primary" } } } },
-    stream: '{"op":"add","path":"/elements/submit","value":{"key":"submit","type":"Button","props":{"label":"Send Message","variant":"primary"}}}',
+    tree: {
+      root: "card",
+      elements: {
+        card: {
+          key: "card",
+          type: "Card",
+          props: { title: "Contact Us", maxWidth: "md" },
+          children: ["name", "email", "message", "submit"],
+        },
+        name: {
+          key: "name",
+          type: "Input",
+          props: { label: "Name", name: "name" },
+        },
+        email: {
+          key: "email",
+          type: "Input",
+          props: { label: "Email", name: "email" },
+        },
+        message: {
+          key: "message",
+          type: "Textarea",
+          props: { label: "Message", name: "message" },
+        },
+        submit: {
+          key: "submit",
+          type: "Button",
+          props: { label: "Send Message", variant: "primary" },
+        },
+      },
+    },
+    stream:
+      '{"op":"add","path":"/elements/submit","value":{"key":"submit","type":"Button","props":{"label":"Send Message","variant":"primary"}}}',
   },
 ];
 
@@ -85,12 +193,14 @@ export function Demo() {
   // Initialize interactive state for Select components
   useInteractiveState();
 
-  const currentSimulationStage = stageIndex >= 0 ? SIMULATION_STAGES[stageIndex] : null;
+  const currentSimulationStage =
+    stageIndex >= 0 ? SIMULATION_STAGES[stageIndex] : null;
 
   // Determine which tree to display - keep simulation tree until new API response
-  const currentTree = mode === "simulation" 
-    ? (currentSimulationStage?.tree || simulationTree) 
-    : (apiTree || simulationTree);
+  const currentTree =
+    mode === "simulation"
+      ? currentSimulationStage?.tree || simulationTree
+      : apiTree || simulationTree;
 
   const stopGeneration = useCallback(() => {
     if (mode === "simulation") {
@@ -152,7 +262,10 @@ export function Demo() {
     if (mode === "interactive" && apiTree) {
       // Convert tree to stream line for display
       const streamLine = JSON.stringify({ tree: apiTree });
-      if (!streamLines.includes(streamLine) && Object.keys(apiTree.elements).length > 0) {
+      if (
+        !streamLines.includes(streamLine) &&
+        Object.keys(apiTree.elements).length > 0
+      ) {
         setStreamLines((prev) => {
           const lastLine = prev[prev.length - 1];
           if (lastLine !== streamLine) {
@@ -172,15 +285,20 @@ export function Demo() {
 
   // Expose action handler for registry components - shows toast with text
   useEffect(() => {
-    (window as unknown as { __demoAction?: (text: string) => void }).__demoAction = (text: string) => {
+    (
+      window as unknown as { __demoAction?: (text: string) => void }
+    ).__demoAction = (text: string) => {
       toast(text);
     };
     return () => {
-      delete (window as unknown as { __demoAction?: (text: string) => void }).__demoAction;
+      delete (window as unknown as { __demoAction?: (text: string) => void })
+        .__demoAction;
     };
   }, []);
 
-  const jsonCode = currentTree ? JSON.stringify(currentTree, null, 2) : "// waiting...";
+  const jsonCode = currentTree
+    ? JSON.stringify(currentTree, null, 2)
+    : "// waiting...";
 
   const isTypingSimulation = mode === "simulation" && phase === "typing";
   const isStreamingSimulation = mode === "simulation" && phase === "streaming";
@@ -205,7 +323,9 @@ export function Demo() {
         >
           {mode === "simulation" ? (
             <div className="flex items-center flex-1">
-              <span className="inline-flex items-center h-5">{typedPrompt}</span>
+              <span className="inline-flex items-center h-5">
+                {typedPrompt}
+              </span>
               {isTypingSimulation && (
                 <span className="inline-block w-2 h-4 bg-foreground ml-0.5 animate-pulse" />
               )}
@@ -230,7 +350,7 @@ export function Demo() {
               />
             </form>
           )}
-          {(mode === "simulation" || isStreaming) ? (
+          {mode === "simulation" || isStreaming ? (
             <button
               onClick={(e) => {
                 e.stopPropagation();
@@ -276,7 +396,8 @@ export function Demo() {
           )}
         </div>
         <div className="mt-2 text-xs text-muted-foreground text-center">
-          Try: &quot;Create a login form&quot; or &quot;Build a feedback form with rating&quot;
+          Try: &quot;Create a login form&quot; or &quot;Build a feedback form
+          with rating&quot;
         </div>
       </div>
 
@@ -289,7 +410,9 @@ export function Demo() {
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={`text-xs font-mono transition-colors ${
-                  activeTab === tab ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+                  activeTab === tab
+                    ? "text-foreground"
+                    : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 {tab}
@@ -327,7 +450,9 @@ export function Demo() {
         {/* Rendered output using json-render */}
         <div>
           <div className="flex items-center justify-between mb-2 h-6">
-            <div className="text-xs text-muted-foreground font-mono">render</div>
+            <div className="text-xs text-muted-foreground font-mono">
+              render
+            </div>
             <button
               onClick={() => setIsFullscreen(true)}
               className="text-muted-foreground hover:text-foreground transition-colors"
@@ -353,12 +478,24 @@ export function Demo() {
           <div className="border border-border rounded p-3 bg-background h-96 overflow-auto">
             {currentTree && currentTree.root ? (
               <div className="animate-in fade-in duration-200 w-full min-h-full flex items-center justify-center py-4">
-                <JSONUIProvider registry={demoRegistry as Parameters<typeof JSONUIProvider>[0]['registry']}>
+                <JSONUIProvider
+                  registry={
+                    demoRegistry as Parameters<
+                      typeof JSONUIProvider
+                    >[0]["registry"]
+                  }
+                >
                   <Renderer
                     tree={currentTree}
-                    registry={demoRegistry as Parameters<typeof Renderer>[0]['registry']}
+                    registry={
+                      demoRegistry as Parameters<typeof Renderer>[0]["registry"]
+                    }
                     loading={isStreaming || isStreamingSimulation}
-                    fallback={fallbackComponent as Parameters<typeof Renderer>[0]['fallback']}
+                    fallback={
+                      fallbackComponent as Parameters<
+                        typeof Renderer
+                      >[0]["fallback"]
+                    }
                   />
                 </JSONUIProvider>
               </div>
@@ -400,12 +537,24 @@ export function Demo() {
           <div className="flex-1 overflow-auto p-6">
             {currentTree && currentTree.root ? (
               <div className="w-full min-h-full flex items-center justify-center">
-                <JSONUIProvider registry={demoRegistry as Parameters<typeof JSONUIProvider>[0]['registry']}>
+                <JSONUIProvider
+                  registry={
+                    demoRegistry as Parameters<
+                      typeof JSONUIProvider
+                    >[0]["registry"]
+                  }
+                >
                   <Renderer
                     tree={currentTree}
-                    registry={demoRegistry as Parameters<typeof Renderer>[0]['registry']}
+                    registry={
+                      demoRegistry as Parameters<typeof Renderer>[0]["registry"]
+                    }
                     loading={isStreaming || isStreamingSimulation}
-                    fallback={fallbackComponent as Parameters<typeof Renderer>[0]['fallback']}
+                    fallback={
+                      fallbackComponent as Parameters<
+                        typeof Renderer
+                      >[0]["fallback"]
+                    }
                   />
                 </JSONUIProvider>
               </div>

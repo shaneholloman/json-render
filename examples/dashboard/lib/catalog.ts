@@ -1,46 +1,46 @@
-import { createCatalog } from '@json-render/core';
-import { z } from 'zod';
+import { createCatalog } from "@json-render/core";
+import { z } from "zod";
 
 /**
  * Dashboard component catalog
  *
  * This defines the ONLY components that the AI can generate.
  * It acts as a guardrail - the AI cannot create arbitrary HTML/CSS.
- * 
+ *
  * Note: OpenAI structured output requires all fields to be required.
  * Use .nullable() instead of .optional() for optional fields.
  */
 export const dashboardCatalog = createCatalog({
-  name: 'dashboard',
+  name: "dashboard",
   components: {
     // Layout Components
     Card: {
       props: z.object({
         title: z.string().nullable(),
         description: z.string().nullable(),
-        padding: z.enum(['sm', 'md', 'lg']).nullable(),
+        padding: z.enum(["sm", "md", "lg"]).nullable(),
       }),
       hasChildren: true,
-      description: 'A card container with optional title',
+      description: "A card container with optional title",
     },
 
     Grid: {
       props: z.object({
         columns: z.number().min(1).max(4).nullable(),
-        gap: z.enum(['sm', 'md', 'lg']).nullable(),
+        gap: z.enum(["sm", "md", "lg"]).nullable(),
       }),
       hasChildren: true,
-      description: 'Grid layout with configurable columns',
+      description: "Grid layout with configurable columns",
     },
 
     Stack: {
       props: z.object({
-        direction: z.enum(['horizontal', 'vertical']).nullable(),
-        gap: z.enum(['sm', 'md', 'lg']).nullable(),
-        align: z.enum(['start', 'center', 'end', 'stretch']).nullable(),
+        direction: z.enum(["horizontal", "vertical"]).nullable(),
+        gap: z.enum(["sm", "md", "lg"]).nullable(),
+        align: z.enum(["start", "center", "end", "stretch"]).nullable(),
       }),
       hasChildren: true,
-      description: 'Flex stack for horizontal or vertical layouts',
+      description: "Flex stack for horizontal or vertical layouts",
     },
 
     // Data Display Components
@@ -48,21 +48,21 @@ export const dashboardCatalog = createCatalog({
       props: z.object({
         label: z.string(),
         valuePath: z.string(),
-        format: z.enum(['number', 'currency', 'percent']).nullable(),
-        trend: z.enum(['up', 'down', 'neutral']).nullable(),
+        format: z.enum(["number", "currency", "percent"]).nullable(),
+        trend: z.enum(["up", "down", "neutral"]).nullable(),
         trendValue: z.string().nullable(),
       }),
-      description: 'Display a single metric with optional trend indicator',
+      description: "Display a single metric with optional trend indicator",
     },
 
     Chart: {
       props: z.object({
-        type: z.enum(['bar', 'line', 'pie', 'area']),
+        type: z.enum(["bar", "line", "pie", "area"]),
         dataPath: z.string(),
         title: z.string().nullable(),
         height: z.number().nullable(),
       }),
-      description: 'Display a chart from array data',
+      description: "Display a chart from array data",
     },
 
     Table: {
@@ -72,11 +72,11 @@ export const dashboardCatalog = createCatalog({
           z.object({
             key: z.string(),
             label: z.string(),
-            format: z.enum(['text', 'currency', 'date', 'badge']).nullable(),
-          })
+            format: z.enum(["text", "currency", "date", "badge"]).nullable(),
+          }),
         ),
       }),
-      description: 'Display tabular data',
+      description: "Display tabular data",
     },
 
     List: {
@@ -85,19 +85,19 @@ export const dashboardCatalog = createCatalog({
         emptyMessage: z.string().nullable(),
       }),
       hasChildren: true,
-      description: 'Render a list from array data',
+      description: "Render a list from array data",
     },
 
     // Interactive Components
     Button: {
       props: z.object({
         label: z.string(),
-        variant: z.enum(['primary', 'secondary', 'danger', 'ghost']).nullable(),
-        size: z.enum(['sm', 'md', 'lg']).nullable(),
+        variant: z.enum(["primary", "secondary", "danger", "ghost"]).nullable(),
+        size: z.enum(["sm", "md", "lg"]).nullable(),
         action: z.string(),
         disabled: z.boolean().nullable(),
       }),
-      description: 'Clickable button with action',
+      description: "Clickable button with action",
     },
 
     Select: {
@@ -108,11 +108,11 @@ export const dashboardCatalog = createCatalog({
           z.object({
             value: z.string(),
             label: z.string(),
-          })
+          }),
         ),
         placeholder: z.string().nullable(),
       }),
-      description: 'Dropdown select input',
+      description: "Dropdown select input",
     },
 
     DatePicker: {
@@ -121,44 +121,48 @@ export const dashboardCatalog = createCatalog({
         bindPath: z.string(),
         placeholder: z.string().nullable(),
       }),
-      description: 'Date picker input',
+      description: "Date picker input",
     },
 
     // Typography
     Heading: {
       props: z.object({
         text: z.string(),
-        level: z.enum(['h1', 'h2', 'h3', 'h4']).nullable(),
+        level: z.enum(["h1", "h2", "h3", "h4"]).nullable(),
       }),
-      description: 'Section heading',
+      description: "Section heading",
     },
 
     Text: {
       props: z.object({
         content: z.string(),
-        variant: z.enum(['body', 'caption', 'label']).nullable(),
-        color: z.enum(['default', 'muted', 'success', 'warning', 'danger']).nullable(),
+        variant: z.enum(["body", "caption", "label"]).nullable(),
+        color: z
+          .enum(["default", "muted", "success", "warning", "danger"])
+          .nullable(),
       }),
-      description: 'Text paragraph',
+      description: "Text paragraph",
     },
 
     // Status Components
     Badge: {
       props: z.object({
         text: z.string(),
-        variant: z.enum(['default', 'success', 'warning', 'danger', 'info']).nullable(),
+        variant: z
+          .enum(["default", "success", "warning", "danger", "info"])
+          .nullable(),
       }),
-      description: 'Small status badge',
+      description: "Small status badge",
     },
 
     Alert: {
       props: z.object({
-        type: z.enum(['info', 'success', 'warning', 'error']),
+        type: z.enum(["info", "success", "warning", "error"]),
         title: z.string(),
         message: z.string().nullable(),
         dismissible: z.boolean().nullable(),
       }),
-      description: 'Alert/notification banner',
+      description: "Alert/notification banner",
     },
 
     // Special Components
@@ -166,7 +170,7 @@ export const dashboardCatalog = createCatalog({
       props: z.object({
         label: z.string().nullable(),
       }),
-      description: 'Visual divider',
+      description: "Visual divider",
     },
 
     Empty: {
@@ -176,16 +180,16 @@ export const dashboardCatalog = createCatalog({
         action: z.string().nullable(),
         actionLabel: z.string().nullable(),
       }),
-      description: 'Empty state placeholder',
+      description: "Empty state placeholder",
     },
   },
   actions: {
-    export_report: { description: 'Export the current dashboard to PDF' },
-    refresh_data: { description: 'Refresh all metrics and charts' },
-    view_details: { description: 'View detailed information' },
-    apply_filter: { description: 'Apply the current filter settings' },
+    export_report: { description: "Export the current dashboard to PDF" },
+    refresh_data: { description: "Refresh all metrics and charts" },
+    view_details: { description: "View detailed information" },
+    apply_filter: { description: "Apply the current filter settings" },
   },
-  validation: 'strict',
+  validation: "strict",
 });
 
 // Export the component list for the AI prompt

@@ -1,12 +1,12 @@
-import { streamText } from 'ai';
-import { componentList } from '@/lib/catalog';
+import { streamText } from "ai";
+import { componentList } from "@/lib/catalog";
 
 export const maxDuration = 30;
 
 const SYSTEM_PROMPT = `You are a dashboard widget generator that outputs JSONL (JSON Lines) patches.
 
 AVAILABLE COMPONENTS:
-${componentList.join(', ')}
+${componentList.join(", ")}
 
 COMPONENT DETAILS:
 - Card: { title?: string, description?: string, padding?: "sm"|"md"|"lg" } - Container with optional title
@@ -69,7 +69,7 @@ export async function POST(req: Request) {
   }
 
   const result = streamText({
-    model: 'anthropic/claude-opus-4.5',
+    model: "anthropic/claude-opus-4.5",
     system: SYSTEM_PROMPT,
     prompt: fullPrompt,
     temperature: 0.7,

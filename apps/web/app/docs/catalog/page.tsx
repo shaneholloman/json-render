@@ -18,9 +18,18 @@ export default function CatalogPage() {
         A catalog is a schema that defines:
       </p>
       <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1 mb-4">
-        <li><strong className="text-foreground">Components</strong> — UI elements AI can create</li>
-        <li><strong className="text-foreground">Actions</strong> — Operations AI can trigger</li>
-        <li><strong className="text-foreground">Validation Functions</strong> — Custom validators for form inputs</li>
+        <li>
+          <strong className="text-foreground">Components</strong> — UI elements
+          AI can create
+        </li>
+        <li>
+          <strong className="text-foreground">Actions</strong> — Operations AI
+          can trigger
+        </li>
+        <li>
+          <strong className="text-foreground">Validation Functions</strong> —
+          Custom validators for form inputs
+        </li>
       </ul>
 
       <h2 className="text-xl font-semibold mt-12 mb-4">Creating a Catalog</h2>
@@ -83,9 +92,12 @@ const catalog = createCatalog({
   description?: string,     // Help AI understand when to use it
 }`}</Code>
 
-      <h2 className="text-xl font-semibold mt-12 mb-4">Generating AI Prompts</h2>
+      <h2 className="text-xl font-semibold mt-12 mb-4">
+        Generating AI Prompts
+      </h2>
       <p className="text-sm text-muted-foreground mb-4">
-        Use <code className="text-foreground">generateCatalogPrompt</code> to create a system prompt for AI:
+        Use <code className="text-foreground">generateCatalogPrompt</code> to
+        create a system prompt for AI:
       </p>
       <Code lang="typescript">{`import { generateCatalogPrompt } from '@json-render/core';
 
@@ -94,7 +106,14 @@ const systemPrompt = generateCatalogPrompt(catalog);
 
       <h2 className="text-xl font-semibold mt-12 mb-4">Next</h2>
       <p className="text-sm text-muted-foreground">
-        Learn how to <Link href="/docs/components" className="text-foreground hover:underline">register React components</Link> for your catalog.
+        Learn how to{" "}
+        <Link
+          href="/docs/components"
+          className="text-foreground hover:underline"
+        >
+          register React components
+        </Link>{" "}
+        for your catalog.
       </p>
     </article>
   );

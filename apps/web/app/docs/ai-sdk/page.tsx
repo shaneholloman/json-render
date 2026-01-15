@@ -77,7 +77,8 @@ function GenerativeUI() {
 
       <h2 className="text-xl font-semibold mt-12 mb-4">Prompt Engineering</h2>
       <p className="text-sm text-muted-foreground mb-4">
-        The <code className="text-foreground">generateCatalogPrompt</code> function creates an optimized prompt that:
+        The <code className="text-foreground">generateCatalogPrompt</code>{" "}
+        function creates an optimized prompt that:
       </p>
       <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1 mb-4">
         <li>Lists all available components and their props</li>
@@ -86,7 +87,9 @@ function GenerativeUI() {
         <li>Includes examples for better generation</li>
       </ul>
 
-      <h2 className="text-xl font-semibold mt-12 mb-4">Custom System Prompts</h2>
+      <h2 className="text-xl font-semibold mt-12 mb-4">
+        Custom System Prompts
+      </h2>
       <Code lang="typescript">{`const basePrompt = generateCatalogPrompt(catalog);
 
 const customPrompt = \`
@@ -100,7 +103,14 @@ Additional instructions:
 
       <h2 className="text-xl font-semibold mt-12 mb-4">Next</h2>
       <p className="text-sm text-muted-foreground">
-        Learn about <Link href="/docs/streaming" className="text-foreground hover:underline">progressive streaming</Link>.
+        Learn about{" "}
+        <Link
+          href="/docs/streaming"
+          className="text-foreground hover:underline"
+        >
+          progressive streaming
+        </Link>
+        .
       </p>
     </article>
   );

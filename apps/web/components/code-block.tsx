@@ -21,7 +21,11 @@ const vercelDarkTheme = {
       settings: { foreground: "#50E3C2" },
     },
     {
-      scope: ["constant.numeric", "constant.language.boolean", "constant.language.null"],
+      scope: [
+        "constant.numeric",
+        "constant.language.boolean",
+        "constant.language.null",
+      ],
       settings: { foreground: "#50E3C2" },
     },
     {
@@ -49,7 +53,11 @@ const vercelDarkTheme = {
       settings: { foreground: "#888888" },
     },
     {
-      scope: ["support.type.property-name", "entity.name.tag.json", "meta.object-literal.key"],
+      scope: [
+        "support.type.property-name",
+        "entity.name.tag.json",
+        "meta.object-literal.key",
+      ],
       settings: { foreground: "#EDEDED" },
     },
     {
@@ -80,7 +88,11 @@ const vercelLightTheme = {
       settings: { foreground: "#067a6e" },
     },
     {
-      scope: ["constant.numeric", "constant.language.boolean", "constant.language.null"],
+      scope: [
+        "constant.numeric",
+        "constant.language.boolean",
+        "constant.language.null",
+      ],
       settings: { foreground: "#067a6e" },
     },
     {
@@ -108,7 +120,11 @@ const vercelLightTheme = {
       settings: { foreground: "#6b7280" },
     },
     {
-      scope: ["support.type.property-name", "entity.name.tag.json", "meta.object-literal.key"],
+      scope: [
+        "support.type.property-name",
+        "entity.name.tag.json",
+        "meta.object-literal.key",
+      ],
       settings: { foreground: "#171717" },
     },
     {
@@ -150,14 +166,16 @@ export function CodeBlock({ code, lang }: CodeBlockProps) {
 
   useEffect(() => {
     getHighlighter().then((highlighter) => {
-      setHtml(highlighter.codeToHtml(code, {
-        lang,
-        themes: {
-          light: "vercel-light",
-          dark: "vercel-dark",
-        },
-        defaultColor: false,
-      }));
+      setHtml(
+        highlighter.codeToHtml(code, {
+          lang,
+          themes: {
+            light: "vercel-light",
+            dark: "vercel-dark",
+          },
+          defaultColor: false,
+        }),
+      );
     });
   }, [code, lang]);
 

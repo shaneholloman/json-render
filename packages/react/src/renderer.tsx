@@ -1,10 +1,16 @@
-'use client';
+"use client";
 
-import React, { type ComponentType, type ReactNode, useMemo } from 'react';
-import type { UIElement, UITree, Action, Catalog, ComponentDefinition } from '@json-render/core';
-import { useIsVisible } from './contexts/visibility';
-import { useActions } from './contexts/actions';
-import { useData } from './contexts/data';
+import React, { type ComponentType, type ReactNode, useMemo } from "react";
+import type {
+  UIElement,
+  UITree,
+  Action,
+  Catalog,
+  ComponentDefinition,
+} from "@json-render/core";
+import { useIsVisible } from "./contexts/visibility";
+import { useActions } from "./contexts/actions";
+import { useData } from "./contexts/data";
 
 /**
  * Props passed to component renderers
@@ -23,7 +29,9 @@ export interface ComponentRenderProps<P = Record<string, unknown>> {
 /**
  * Component renderer type
  */
-export type ComponentRenderer<P = Record<string, unknown>> = ComponentType<ComponentRenderProps<P>>;
+export type ComponentRenderer<P = Record<string, unknown>> = ComponentType<
+  ComponentRenderProps<P>
+>;
 
 /**
  * Registry of component renderers
@@ -95,11 +103,7 @@ function ElementRenderer({
   });
 
   return (
-    <Component
-      element={element}
-      onAction={execute}
-      loading={loading}
-    >
+    <Component element={element} onAction={execute} loading={loading}>
       {children}
     </Component>
   );
@@ -140,22 +144,28 @@ export interface JSONUIProviderProps {
   /** Auth state */
   authState?: { isSignedIn: boolean; user?: Record<string, unknown> };
   /** Action handlers */
-  actionHandlers?: Record<string, (params: Record<string, unknown>) => Promise<unknown> | unknown>;
+  actionHandlers?: Record<
+    string,
+    (params: Record<string, unknown>) => Promise<unknown> | unknown
+  >;
   /** Navigation function */
   navigate?: (path: string) => void;
   /** Custom validation functions */
-  validationFunctions?: Record<string, (value: unknown, args?: Record<string, unknown>) => boolean>;
+  validationFunctions?: Record<
+    string,
+    (value: unknown, args?: Record<string, unknown>) => boolean
+  >;
   /** Callback when data changes */
   onDataChange?: (path: string, value: unknown) => void;
   children: ReactNode;
 }
 
 // Import the providers
-import { DataProvider } from './contexts/data';
-import { VisibilityProvider } from './contexts/visibility';
-import { ActionProvider } from './contexts/actions';
-import { ValidationProvider } from './contexts/validation';
-import { ConfirmDialog } from './contexts/actions';
+import { DataProvider } from "./contexts/data";
+import { VisibilityProvider } from "./contexts/visibility";
+import { ActionProvider } from "./contexts/actions";
+import { ValidationProvider } from "./contexts/validation";
+import { ConfirmDialog } from "./contexts/actions";
 
 /**
  * Combined provider for all JSONUI contexts
@@ -211,12 +221,12 @@ function ConfirmationDialogManager() {
  * Helper to create a renderer component from a catalog
  */
 export function createRendererFromCatalog<
-  C extends Catalog<Record<string, ComponentDefinition>>
+  C extends Catalog<Record<string, ComponentDefinition>>,
 >(
   _catalog: C,
-  registry: ComponentRegistry
-): ComponentType<Omit<RendererProps, 'registry'>> {
-  return function CatalogRenderer(props: Omit<RendererProps, 'registry'>) {
+  registry: ComponentRegistry,
+): ComponentType<Omit<RendererProps, "registry">> {
+  return function CatalogRenderer(props: Omit<RendererProps, "registry">) {
     return <Renderer {...props} registry={registry} />;
   };
 }

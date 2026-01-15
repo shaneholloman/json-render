@@ -14,7 +14,9 @@ export default function QuickStartPage() {
         Get up and running with json-render in 5 minutes.
       </p>
 
-      <h2 className="text-xl font-semibold mt-12 mb-4">1. Define your catalog</h2>
+      <h2 className="text-xl font-semibold mt-12 mb-4">
+        1. Define your catalog
+      </h2>
       <p className="text-sm text-muted-foreground mb-4">
         Create a catalog that defines what components AI can use:
       </p>
@@ -53,7 +55,9 @@ export const catalog = createCatalog({
   },
 });`}</Code>
 
-      <h2 className="text-xl font-semibold mt-12 mb-4">2. Create your components</h2>
+      <h2 className="text-xl font-semibold mt-12 mb-4">
+        2. Create your components
+      </h2>
       <p className="text-sm text-muted-foreground mb-4">
         Register React components that render each catalog type:
       </p>
@@ -81,7 +85,9 @@ export const registry = {
   ),
 };`}</Code>
 
-      <h2 className="text-xl font-semibold mt-12 mb-4">3. Create an API route</h2>
+      <h2 className="text-xl font-semibold mt-12 mb-4">
+        3. Create an API route
+      </h2>
       <p className="text-sm text-muted-foreground mb-4">
         Set up a streaming API route for AI generation:
       </p>
@@ -155,10 +161,45 @@ export default function Page() {
 
       <h2 className="text-xl font-semibold mt-12 mb-4">Next steps</h2>
       <ul className="list-disc list-inside text-sm text-muted-foreground space-y-2">
-        <li>Learn about <Link href="/docs/catalog" className="text-foreground hover:underline">catalogs</Link> in depth</li>
-        <li>Explore <Link href="/docs/data-binding" className="text-foreground hover:underline">data binding</Link> for dynamic values</li>
-        <li>Add <Link href="/docs/actions" className="text-foreground hover:underline">actions</Link> for interactivity</li>
-        <li>Implement <Link href="/docs/visibility" className="text-foreground hover:underline">conditional visibility</Link></li>
+        <li>
+          Learn about{" "}
+          <Link
+            href="/docs/catalog"
+            className="text-foreground hover:underline"
+          >
+            catalogs
+          </Link>{" "}
+          in depth
+        </li>
+        <li>
+          Explore{" "}
+          <Link
+            href="/docs/data-binding"
+            className="text-foreground hover:underline"
+          >
+            data binding
+          </Link>{" "}
+          for dynamic values
+        </li>
+        <li>
+          Add{" "}
+          <Link
+            href="/docs/actions"
+            className="text-foreground hover:underline"
+          >
+            actions
+          </Link>{" "}
+          for interactivity
+        </li>
+        <li>
+          Implement{" "}
+          <Link
+            href="/docs/visibility"
+            className="text-foreground hover:underline"
+          >
+            conditional visibility
+          </Link>
+        </li>
       </ul>
 
       <div className="flex gap-3 mt-12">

@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { type ComponentRenderProps } from '@json-render/react';
+import { type ComponentRenderProps } from "@json-render/react";
 
 export function Card({ element, children }: ComponentRenderProps) {
   const { title, description, padding } = element.props as {
@@ -9,17 +9,44 @@ export function Card({ element, children }: ComponentRenderProps) {
     padding?: string | null;
   };
 
-  const paddings: Record<string, string> = { none: '0', sm: '12px', lg: '24px' };
+  const paddings: Record<string, string> = {
+    none: "0",
+    sm: "12px",
+    lg: "24px",
+  };
 
   return (
-    <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }}>
+    <div
+      style={{
+        background: "var(--card)",
+        border: "1px solid var(--border)",
+        borderRadius: "var(--radius)",
+      }}
+    >
       {(title || description) && (
-        <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)' }}>
-          {title && <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600 }}>{title}</h3>}
-          {description && <p style={{ margin: '4px 0 0', fontSize: 14, color: 'var(--muted)' }}>{description}</p>}
+        <div
+          style={{
+            padding: "16px 20px",
+            borderBottom: "1px solid var(--border)",
+          }}
+        >
+          {title && (
+            <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600 }}>
+              {title}
+            </h3>
+          )}
+          {description && (
+            <p
+              style={{ margin: "4px 0 0", fontSize: 14, color: "var(--muted)" }}
+            >
+              {description}
+            </p>
+          )}
         </div>
       )}
-      <div style={{ padding: paddings[padding || ''] || '16px' }}>{children}</div>
+      <div style={{ padding: paddings[padding || ""] || "16px" }}>
+        {children}
+      </div>
     </div>
   );
 }

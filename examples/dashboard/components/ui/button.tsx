@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { type ComponentRenderProps } from '@json-render/react';
+import React from "react";
+import { type ComponentRenderProps } from "@json-render/react";
 
 export function Button({ element, onAction, loading }: ComponentRenderProps) {
   const { label, variant, action, disabled } = element.props as {
@@ -12,10 +12,18 @@ export function Button({ element, onAction, loading }: ComponentRenderProps) {
   };
 
   const variants: Record<string, React.CSSProperties> = {
-    primary: { background: 'var(--foreground)', color: 'var(--background)', border: 'none' },
-    secondary: { background: 'transparent', color: 'var(--foreground)', border: '1px solid var(--border)' },
-    danger: { background: '#dc2626', color: '#fff', border: 'none' },
-    ghost: { background: 'transparent', color: 'var(--muted)', border: 'none' },
+    primary: {
+      background: "var(--foreground)",
+      color: "var(--background)",
+      border: "none",
+    },
+    secondary: {
+      background: "transparent",
+      color: "var(--foreground)",
+      border: "1px solid var(--border)",
+    },
+    danger: { background: "#dc2626", color: "#fff", border: "none" },
+    ghost: { background: "transparent", color: "var(--muted)", border: "none" },
   };
 
   return (
@@ -23,15 +31,15 @@ export function Button({ element, onAction, loading }: ComponentRenderProps) {
       onClick={() => !disabled && action && onAction?.(action)}
       disabled={!!disabled || loading}
       style={{
-        padding: '8px 16px',
-        borderRadius: 'var(--radius)',
+        padding: "8px 16px",
+        borderRadius: "var(--radius)",
         fontSize: 14,
         fontWeight: 500,
         opacity: disabled ? 0.5 : 1,
-        ...variants[variant || 'primary'],
+        ...variants[variant || "primary"],
       }}
     >
-      {loading ? 'Loading...' : label}
+      {loading ? "Loading..." : label}
     </button>
   );
 }

@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback } from "react";
 import {
   DataProvider,
   ActionProvider,
   VisibilityProvider,
   useUIStream,
   Renderer,
-} from '@json-render/react';
-import { componentRegistry } from '@/components/ui';
+} from "@json-render/react";
+import { componentRegistry } from "@/components/ui";
 
 const INITIAL_DATA = {
   analytics: {
@@ -17,36 +17,61 @@ const INITIAL_DATA = {
     customers: 1234,
     orders: 567,
     salesByRegion: [
-      { label: 'US', value: 45000 },
-      { label: 'EU', value: 35000 },
-      { label: 'Asia', value: 28000 },
-      { label: 'Other', value: 17000 },
+      { label: "US", value: 45000 },
+      { label: "EU", value: 35000 },
+      { label: "Asia", value: 28000 },
+      { label: "Other", value: 17000 },
     ],
     recentTransactions: [
-      { id: 'TXN001', customer: 'Acme Corp', amount: 1500, status: 'completed', date: '2024-01-15' },
-      { id: 'TXN002', customer: 'Globex Inc', amount: 2300, status: 'pending', date: '2024-01-14' },
-      { id: 'TXN003', customer: 'Initech', amount: 890, status: 'completed', date: '2024-01-13' },
-      { id: 'TXN004', customer: 'Umbrella Co', amount: 4200, status: 'completed', date: '2024-01-12' },
+      {
+        id: "TXN001",
+        customer: "Acme Corp",
+        amount: 1500,
+        status: "completed",
+        date: "2024-01-15",
+      },
+      {
+        id: "TXN002",
+        customer: "Globex Inc",
+        amount: 2300,
+        status: "pending",
+        date: "2024-01-14",
+      },
+      {
+        id: "TXN003",
+        customer: "Initech",
+        amount: 890,
+        status: "completed",
+        date: "2024-01-13",
+      },
+      {
+        id: "TXN004",
+        customer: "Umbrella Co",
+        amount: 4200,
+        status: "completed",
+        date: "2024-01-12",
+      },
     ],
   },
   form: {
-    dateRange: '',
-    region: '',
+    dateRange: "",
+    region: "",
   },
 };
 
 const ACTION_HANDLERS = {
-  export_report: () => alert('Exporting report...'),
-  refresh_data: () => alert('Refreshing data...'),
-  view_details: (params: Record<string, unknown>) => alert(`Details: ${JSON.stringify(params)}`),
-  apply_filter: () => alert('Applying filters...'),
+  export_report: () => alert("Exporting report..."),
+  refresh_data: () => alert("Refreshing data..."),
+  view_details: (params: Record<string, unknown>) =>
+    alert(`Details: ${JSON.stringify(params)}`),
+  apply_filter: () => alert("Applying filters..."),
 };
 
 function DashboardContent() {
-  const [prompt, setPrompt] = useState('');
+  const [prompt, setPrompt] = useState("");
   const { tree, isStreaming, error, send, clear } = useUIStream({
-    api: '/api/generate',
-    onError: (err) => console.error('Generation error:', err),
+    api: "/api/generate",
+    onError: (err) => console.error("Generation error:", err),
   });
 
   const handleSubmit = useCallback(
@@ -55,30 +80,37 @@ function DashboardContent() {
       if (!prompt.trim()) return;
       await send(prompt, { data: INITIAL_DATA });
     },
-    [prompt, send]
+    [prompt, send],
   );
 
   const examples = [
-    'Revenue dashboard with metrics and chart',
-    'Recent transactions table',
-    'Customer count with trend',
+    "Revenue dashboard with metrics and chart",
+    "Recent transactions table",
+    "Customer count with trend",
   ];
 
   const hasElements = tree && Object.keys(tree.elements).length > 0;
 
   return (
-    <div style={{ maxWidth: 960, margin: '0 auto', padding: '48px 24px' }}>
+    <div style={{ maxWidth: 960, margin: "0 auto", padding: "48px 24px" }}>
       <header style={{ marginBottom: 48 }}>
-        <h1 style={{ margin: 0, fontSize: 32, fontWeight: 600, letterSpacing: '-0.02em' }}>
+        <h1
+          style={{
+            margin: 0,
+            fontSize: 32,
+            fontWeight: 600,
+            letterSpacing: "-0.02em",
+          }}
+        >
           Dashboard
         </h1>
-        <p style={{ margin: '8px 0 0', color: 'var(--muted)', fontSize: 16 }}>
+        <p style={{ margin: "8px 0 0", color: "var(--muted)", fontSize: 16 }}>
           Generate widgets from prompts. Constrained to your catalog.
         </p>
       </header>
 
       <form onSubmit={handleSubmit} style={{ marginBottom: 32 }}>
-        <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+        <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
           <input
             type="text"
             value={prompt}
@@ -87,41 +119,41 @@ function DashboardContent() {
             disabled={isStreaming}
             style={{
               flex: 1,
-              padding: '12px 16px',
-              background: 'var(--card)',
-              border: '1px solid var(--border)',
-              borderRadius: 'var(--radius)',
-              color: 'var(--foreground)',
+              padding: "12px 16px",
+              background: "var(--card)",
+              border: "1px solid var(--border)",
+              borderRadius: "var(--radius)",
+              color: "var(--foreground)",
               fontSize: 16,
-              outline: 'none',
+              outline: "none",
             }}
           />
           <button
             type="submit"
             disabled={isStreaming || !prompt.trim()}
             style={{
-              padding: '12px 24px',
-              background: isStreaming ? 'var(--border)' : 'var(--foreground)',
-              color: 'var(--background)',
-              border: 'none',
-              borderRadius: 'var(--radius)',
+              padding: "12px 24px",
+              background: isStreaming ? "var(--border)" : "var(--foreground)",
+              color: "var(--background)",
+              border: "none",
+              borderRadius: "var(--radius)",
               fontSize: 16,
               fontWeight: 500,
               opacity: isStreaming || !prompt.trim() ? 0.5 : 1,
             }}
           >
-            {isStreaming ? 'Generating...' : 'Generate'}
+            {isStreaming ? "Generating..." : "Generate"}
           </button>
           {hasElements && (
             <button
               type="button"
               onClick={clear}
               style={{
-                padding: '12px 16px',
-                background: 'transparent',
-                color: 'var(--muted)',
-                border: '1px solid var(--border)',
-                borderRadius: 'var(--radius)',
+                padding: "12px 16px",
+                background: "transparent",
+                color: "var(--muted)",
+                border: "1px solid var(--border)",
+                borderRadius: "var(--radius)",
                 fontSize: 16,
               }}
             >
@@ -130,18 +162,18 @@ function DashboardContent() {
           )}
         </div>
 
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           {examples.map((ex) => (
             <button
               key={ex}
               type="button"
               onClick={() => setPrompt(ex)}
               style={{
-                padding: '6px 12px',
-                background: 'var(--card)',
-                color: 'var(--muted)',
-                border: '1px solid var(--border)',
-                borderRadius: 'var(--radius)',
+                padding: "6px 12px",
+                background: "var(--card)",
+                color: "var(--muted)",
+                border: "1px solid var(--border)",
+                borderRadius: "var(--radius)",
                 fontSize: 13,
               }}
             >
@@ -156,10 +188,10 @@ function DashboardContent() {
           style={{
             padding: 16,
             marginBottom: 24,
-            background: 'var(--card)',
-            border: '1px solid var(--border)',
-            borderRadius: 'var(--radius)',
-            color: '#ef4444',
+            background: "var(--card)",
+            border: "1px solid var(--border)",
+            borderRadius: "var(--radius)",
+            color: "#ef4444",
             fontSize: 14,
           }}
         >
@@ -171,35 +203,47 @@ function DashboardContent() {
         style={{
           minHeight: 300,
           padding: 24,
-          background: 'var(--card)',
-          border: '1px solid var(--border)',
-          borderRadius: 'var(--radius)',
+          background: "var(--card)",
+          border: "1px solid var(--border)",
+          borderRadius: "var(--radius)",
         }}
       >
         {!hasElements && !isStreaming ? (
-          <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--muted)' }}>
+          <div
+            style={{
+              textAlign: "center",
+              padding: "60px 20px",
+              color: "var(--muted)",
+            }}
+          >
             <p style={{ margin: 0 }}>Enter a prompt to generate a widget</p>
           </div>
         ) : tree ? (
-          <Renderer tree={tree} registry={componentRegistry} loading={isStreaming} />
+          <Renderer
+            tree={tree}
+            registry={componentRegistry}
+            loading={isStreaming}
+          />
         ) : null}
       </div>
 
       {hasElements && (
         <details style={{ marginTop: 24 }}>
-          <summary style={{ cursor: 'pointer', fontSize: 14, color: 'var(--muted)' }}>
+          <summary
+            style={{ cursor: "pointer", fontSize: 14, color: "var(--muted)" }}
+          >
             View JSON
           </summary>
           <pre
             style={{
               marginTop: 8,
               padding: 16,
-              background: 'var(--card)',
-              border: '1px solid var(--border)',
-              borderRadius: 'var(--radius)',
-              overflow: 'auto',
+              background: "var(--card)",
+              border: "1px solid var(--border)",
+              borderRadius: "var(--radius)",
+              overflow: "auto",
               fontSize: 12,
-              color: 'var(--muted)',
+              color: "var(--muted)",
             }}
           >
             {JSON.stringify(tree, null, 2)}

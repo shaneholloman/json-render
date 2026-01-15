@@ -55,7 +55,8 @@ function App() {
 
       <h2 className="text-xl font-semibold mt-12 mb-4">Reading Data</h2>
       <p className="text-sm text-muted-foreground mb-4">
-        Use <code className="text-foreground">useDataValue</code> for read-only access:
+        Use <code className="text-foreground">useDataValue</code> for read-only
+        access:
       </p>
       <Code lang="tsx">{`import { useDataValue } from '@json-render/react';
 
@@ -66,7 +67,8 @@ function UserGreeting() {
 
       <h2 className="text-xl font-semibold mt-12 mb-4">Two-Way Binding</h2>
       <p className="text-sm text-muted-foreground mb-4">
-        Use <code className="text-foreground">useDataBinding</code> for read-write access:
+        Use <code className="text-foreground">useDataBinding</code> for
+        read-write access:
       </p>
       <Code lang="tsx">{`import { useDataBinding } from '@json-render/react';
 
@@ -82,7 +84,9 @@ function EmailInput() {
   );
 }`}</Code>
 
-      <h2 className="text-xl font-semibold mt-12 mb-4">Using the Data Context</h2>
+      <h2 className="text-xl font-semibold mt-12 mb-4">
+        Using the Data Context
+      </h2>
       <p className="text-sm text-muted-foreground mb-4">
         Access the full data context for advanced use cases:
       </p>
@@ -118,7 +122,11 @@ function DataDebugger() {
 
       <h2 className="text-xl font-semibold mt-12 mb-4">Next</h2>
       <p className="text-sm text-muted-foreground">
-        Learn about <Link href="/docs/actions" className="text-foreground hover:underline">actions</Link> for user interactions.
+        Learn about{" "}
+        <Link href="/docs/actions" className="text-foreground hover:underline">
+          actions
+        </Link>{" "}
+        for user interactions.
       </p>
     </article>
   );

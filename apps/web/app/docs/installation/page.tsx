@@ -17,7 +17,9 @@ export default function InstallationPage() {
       <h2 className="text-xl font-semibold mt-12 mb-4">Install packages</h2>
       <Code lang="bash">npm install @json-render/core @json-render/react</Code>
 
-      <p className="text-sm text-muted-foreground mb-4">Or with other package managers:</p>
+      <p className="text-sm text-muted-foreground mb-4">
+        Or with other package managers:
+      </p>
       <Code lang="bash">{`# pnpm
 pnpm add @json-render/core @json-render/react
 
@@ -32,14 +34,19 @@ bun add @json-render/core @json-render/react`}</Code>
         json-render requires the following peer dependencies:
       </p>
       <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1 mb-4">
-        <li><code className="text-foreground">react</code> ^19.0.0</li>
-        <li><code className="text-foreground">zod</code> ^3.0.0</li>
+        <li>
+          <code className="text-foreground">react</code> ^19.0.0
+        </li>
+        <li>
+          <code className="text-foreground">zod</code> ^3.0.0
+        </li>
       </ul>
       <Code lang="bash">npm install react zod</Code>
 
       <h2 className="text-xl font-semibold mt-12 mb-4">For AI Integration</h2>
       <p className="text-sm text-muted-foreground mb-4">
-        To use json-render with AI models, you&apos;ll also need the Vercel AI SDK:
+        To use json-render with AI models, you&apos;ll also need the Vercel AI
+        SDK:
       </p>
       <Code lang="bash">npm install ai</Code>
 

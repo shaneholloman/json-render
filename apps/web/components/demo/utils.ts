@@ -18,13 +18,13 @@ let openSelect: string | null = null;
 let setOpenSelect: (v: string | null) => void = () => {};
 let selectValues: Record<string, string> = {};
 let setSelectValues: (
-  fn: (prev: Record<string, string>) => Record<string, string>
+  fn: (prev: Record<string, string>) => Record<string, string>,
 ) => void = () => {};
 
 export function useInteractiveState() {
   const [_openSelect, _setOpenSelect] = useState<string | null>(null);
   const [_selectValues, _setSelectValues] = useState<Record<string, string>>(
-    {}
+    {},
   );
 
   openSelect = _openSelect;

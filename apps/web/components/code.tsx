@@ -18,7 +18,11 @@ const vercelDarkTheme = {
       settings: { foreground: "#50E3C2" },
     },
     {
-      scope: ["constant.numeric", "constant.language.boolean", "constant.language.null"],
+      scope: [
+        "constant.numeric",
+        "constant.language.boolean",
+        "constant.language.null",
+      ],
       settings: { foreground: "#50E3C2" },
     },
     {
@@ -46,7 +50,11 @@ const vercelDarkTheme = {
       settings: { foreground: "#888888" },
     },
     {
-      scope: ["support.type.property-name", "entity.name.tag.json", "meta.object-literal.key"],
+      scope: [
+        "support.type.property-name",
+        "entity.name.tag.json",
+        "meta.object-literal.key",
+      ],
       settings: { foreground: "#EDEDED" },
     },
     {
@@ -77,7 +85,11 @@ const vercelLightTheme = {
       settings: { foreground: "#067a6e" },
     },
     {
-      scope: ["constant.numeric", "constant.language.boolean", "constant.language.null"],
+      scope: [
+        "constant.numeric",
+        "constant.language.boolean",
+        "constant.language.null",
+      ],
       settings: { foreground: "#067a6e" },
     },
     {
@@ -105,7 +117,11 @@ const vercelLightTheme = {
       settings: { foreground: "#6b7280" },
     },
     {
-      scope: ["support.type.property-name", "entity.name.tag.json", "meta.object-literal.key"],
+      scope: [
+        "support.type.property-name",
+        "entity.name.tag.json",
+        "meta.object-literal.key",
+      ],
       settings: { foreground: "#171717" },
     },
     {
@@ -142,7 +158,10 @@ export async function Code({ children, lang = "typescript" }: CodeProps) {
           className="opacity-0 group-hover:opacity-100 text-neutral-500 dark:text-neutral-400 bg-neutral-100 dark:bg-[#0a0a0a]"
         />
       </div>
-      <div className="overflow-x-auto [&_pre]:bg-transparent! [&_pre]:m-0! [&_pre]:p-4! [&_code]:bg-transparent! [&_.shiki]:bg-transparent!" dangerouslySetInnerHTML={{ __html: html }} />
+      <div
+        className="overflow-x-auto [&_pre]:bg-transparent! [&_pre]:m-0! [&_pre]:p-4! [&_code]:bg-transparent! [&_.shiki]:bg-transparent!"
+        dangerouslySetInnerHTML={{ __html: html }}
+      />
     </div>
   );
 }

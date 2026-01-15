@@ -18,16 +18,36 @@ export default function ValidationPage() {
         json-render includes common validation functions:
       </p>
       <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1 mb-4">
-        <li><code className="text-foreground">required</code> — Value must be non-empty</li>
-        <li><code className="text-foreground">email</code> — Valid email format</li>
-        <li><code className="text-foreground">minLength</code> — Minimum string length</li>
-        <li><code className="text-foreground">maxLength</code> — Maximum string length</li>
-        <li><code className="text-foreground">pattern</code> — Match a regex pattern</li>
-        <li><code className="text-foreground">min</code> — Minimum numeric value</li>
-        <li><code className="text-foreground">max</code> — Maximum numeric value</li>
+        <li>
+          <code className="text-foreground">required</code> — Value must be
+          non-empty
+        </li>
+        <li>
+          <code className="text-foreground">email</code> — Valid email format
+        </li>
+        <li>
+          <code className="text-foreground">minLength</code> — Minimum string
+          length
+        </li>
+        <li>
+          <code className="text-foreground">maxLength</code> — Maximum string
+          length
+        </li>
+        <li>
+          <code className="text-foreground">pattern</code> — Match a regex
+          pattern
+        </li>
+        <li>
+          <code className="text-foreground">min</code> — Minimum numeric value
+        </li>
+        <li>
+          <code className="text-foreground">max</code> — Maximum numeric value
+        </li>
       </ul>
 
-      <h2 className="text-xl font-semibold mt-12 mb-4">Using Validation in JSON</h2>
+      <h2 className="text-xl font-semibold mt-12 mb-4">
+        Using Validation in JSON
+      </h2>
       <Code lang="json">{`{
   "type": "TextField",
   "props": {
@@ -41,7 +61,9 @@ export default function ValidationPage() {
   }
 }`}</Code>
 
-      <h2 className="text-xl font-semibold mt-12 mb-4">Validation with Parameters</h2>
+      <h2 className="text-xl font-semibold mt-12 mb-4">
+        Validation with Parameters
+      </h2>
       <Code lang="json">{`{
   "type": "TextField",
   "props": {
@@ -63,7 +85,9 @@ export default function ValidationPage() {
   }
 }`}</Code>
 
-      <h2 className="text-xl font-semibold mt-12 mb-4">Custom Validation Functions</h2>
+      <h2 className="text-xl font-semibold mt-12 mb-4">
+        Custom Validation Functions
+      </h2>
       <p className="text-sm text-muted-foreground mb-4">
         Define custom validators in your catalog:
       </p>
@@ -130,17 +154,31 @@ function TextField({ element }) {
 
       <h2 className="text-xl font-semibold mt-12 mb-4">Validation Timing</h2>
       <p className="text-sm text-muted-foreground mb-4">
-        Control when validation runs with <code className="text-foreground">validateOn</code>:
+        Control when validation runs with{" "}
+        <code className="text-foreground">validateOn</code>:
       </p>
       <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
-        <li><code className="text-foreground">change</code> — Validate on every input change</li>
-        <li><code className="text-foreground">blur</code> — Validate when field loses focus</li>
-        <li><code className="text-foreground">submit</code> — Validate only on form submission</li>
+        <li>
+          <code className="text-foreground">change</code> — Validate on every
+          input change
+        </li>
+        <li>
+          <code className="text-foreground">blur</code> — Validate when field
+          loses focus
+        </li>
+        <li>
+          <code className="text-foreground">submit</code> — Validate only on
+          form submission
+        </li>
       </ul>
 
       <h2 className="text-xl font-semibold mt-12 mb-4">Next</h2>
       <p className="text-sm text-muted-foreground">
-        Learn about <Link href="/docs/ai-sdk" className="text-foreground hover:underline">AI SDK integration</Link>.
+        Learn about{" "}
+        <Link href="/docs/ai-sdk" className="text-foreground hover:underline">
+          AI SDK integration
+        </Link>
+        .
       </p>
     </article>
   );

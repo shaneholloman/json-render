@@ -97,7 +97,14 @@ function App() {
 
       <h2 className="text-xl font-semibold mt-12 mb-4">Next</h2>
       <p className="text-sm text-muted-foreground">
-        Learn about <Link href="/docs/data-binding" className="text-foreground hover:underline">data binding</Link> for dynamic values.
+        Learn about{" "}
+        <Link
+          href="/docs/data-binding"
+          className="text-foreground hover:underline"
+        >
+          data binding
+        </Link>{" "}
+        for dynamic values.
       </p>
     </article>
   );

@@ -14,8 +14,8 @@ export default function StreamingPage() {
 
       <h2 className="text-xl font-semibold mt-12 mb-4">How Streaming Works</h2>
       <p className="text-sm text-muted-foreground mb-4">
-        json-render uses JSONL (JSON Lines) streaming. As AI generates, 
-        each line represents a patch operation:
+        json-render uses JSONL (JSON Lines) streaming. As AI generates, each
+        line represents a patch operation:
       </p>
       <Code lang="json">{`{"op":"set","path":"/root","value":{"key":"root","type":"Card","props":{"title":"Dashboard"}}}
 {"op":"add","path":"/root/children","value":{"key":"metric-1","type":"Metric","props":{"label":"Revenue"}}}
@@ -44,10 +44,22 @@ function App() {
         Supported operations:
       </p>
       <ul className="list-disc list-inside text-sm text-muted-foreground space-y-2 mb-4">
-        <li><code className="text-foreground">set</code> — Set the value at a path (creates if needed)</li>
-        <li><code className="text-foreground">add</code> — Add to an array at a path</li>
-        <li><code className="text-foreground">replace</code> — Replace value at a path</li>
-        <li><code className="text-foreground">remove</code> — Remove value at a path</li>
+        <li>
+          <code className="text-foreground">set</code> — Set the value at a path
+          (creates if needed)
+        </li>
+        <li>
+          <code className="text-foreground">add</code> — Add to an array at a
+          path
+        </li>
+        <li>
+          <code className="text-foreground">replace</code> — Replace value at a
+          path
+        </li>
+        <li>
+          <code className="text-foreground">remove</code> — Remove value at a
+          path
+        </li>
       </ul>
 
       <h2 className="text-xl font-semibold mt-12 mb-4">Path Format</h2>
@@ -82,7 +94,9 @@ function App() {
   });
 }`}</Code>
 
-      <h2 className="text-xl font-semibold mt-12 mb-4">Progressive Rendering</h2>
+      <h2 className="text-xl font-semibold mt-12 mb-4">
+        Progressive Rendering
+      </h2>
       <p className="text-sm text-muted-foreground mb-4">
         The Renderer automatically updates as the tree changes:
       </p>

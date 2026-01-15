@@ -29,7 +29,9 @@ function App() {
   );
 }`}</Code>
 
-      <h2 className="text-xl font-semibold mt-12 mb-4">Path-Based Visibility</h2>
+      <h2 className="text-xl font-semibold mt-12 mb-4">
+        Path-Based Visibility
+      </h2>
       <p className="text-sm text-muted-foreground mb-4">
         Show/hide based on data values:
       </p>
@@ -41,7 +43,9 @@ function App() {
 
 // Visible when /form/hasErrors is truthy`}</Code>
 
-      <h2 className="text-xl font-semibold mt-12 mb-4">Auth-Based Visibility</h2>
+      <h2 className="text-xl font-semibold mt-12 mb-4">
+        Auth-Based Visibility
+      </h2>
       <p className="text-sm text-muted-foreground mb-4">
         Show/hide based on authentication state:
       </p>
@@ -129,7 +133,14 @@ function ConditionalContent({ element, children }) {
 
       <h2 className="text-xl font-semibold mt-12 mb-4">Next</h2>
       <p className="text-sm text-muted-foreground">
-        Learn about <Link href="/docs/validation" className="text-foreground hover:underline">form validation</Link>.
+        Learn about{" "}
+        <Link
+          href="/docs/validation"
+          className="text-foreground hover:underline"
+        >
+          form validation
+        </Link>
+        .
       </p>
     </article>
   );

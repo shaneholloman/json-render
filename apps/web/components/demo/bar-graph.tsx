@@ -23,13 +23,14 @@ export function BarGraph({ element }: ComponentRenderProps) {
       <div className="flex gap-1">
         {data.map((d, i) => (
           <div key={i} className="flex-1 flex flex-col items-center gap-1">
-            <div className="text-[8px] text-muted-foreground">
-              {d.value}
-            </div>
+            <div className="text-[8px] text-muted-foreground">{d.value}</div>
             <div className="w-full h-20 flex items-end">
               <div
                 className="w-full bg-foreground/80 rounded-t transition-all"
-                style={{ height: `${(d.value / maxValue) * 100}%`, minHeight: 2 }}
+                style={{
+                  height: `${(d.value / maxValue) * 100}%`,
+                  minHeight: 2,
+                }}
               />
             </div>
             <div className="text-[8px] text-muted-foreground truncate w-full text-center">

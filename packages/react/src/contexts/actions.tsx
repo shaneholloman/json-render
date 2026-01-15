@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import React, {
   createContext,
@@ -7,7 +7,7 @@ import React, {
   useCallback,
   useMemo,
   type ReactNode,
-} from 'react';
+} from "react";
 import {
   resolveAction,
   executeAction,
@@ -15,8 +15,8 @@ import {
   type ActionHandler,
   type ActionConfirm,
   type ResolvedAction,
-} from '@json-render/core';
-import { useData } from './data';
+} from "@json-render/core";
+import { useData } from "./data";
 
 /**
  * Pending confirmation state
@@ -74,13 +74,18 @@ export function ActionProvider({
   children,
 }: ActionProviderProps) {
   const { data, set } = useData();
-  const [handlers, setHandlers] = useState<Record<string, ActionHandler>>(initialHandlers);
+  const [handlers, setHandlers] =
+    useState<Record<string, ActionHandler>>(initialHandlers);
   const [loadingActions, setLoadingActions] = useState<Set<string>>(new Set());
-  const [pendingConfirmation, setPendingConfirmation] = useState<PendingConfirmation | null>(null);
+  const [pendingConfirmation, setPendingConfirmation] =
+    useState<PendingConfirmation | null>(null);
 
-  const registerHandler = useCallback((name: string, handler: ActionHandler) => {
-    setHandlers((prev) => ({ ...prev, [name]: handler }));
-  }, []);
+  const registerHandler = useCallback(
+    (name: string, handler: ActionHandler) => {
+      setHandlers((prev) => ({ ...prev, [name]: handler }));
+    },
+    [],
+  );
 
   const execute = useCallback(
     async (action: Action) => {
@@ -104,7 +109,7 @@ export function ActionProvider({
             },
             reject: () => {
               setPendingConfirmation(null);
-              reject(new Error('Action cancelled'));
+              reject(new Error("Action cancelled"));
             },
           });
         }).then(async () => {
@@ -151,7 +156,7 @@ export function ActionProvider({
         });
       }
     },
-    [data, handlers, set, navigate]
+    [data, handlers, set, navigate],
   );
 
   const confirm = useCallback(() => {
@@ -172,7 +177,15 @@ export function ActionProvider({
       cancel,
       registerHandler,
     }),
-    [handlers, loadingActions, pendingConfirmation, execute, confirm, cancel, registerHandler]
+    [
+      handlers,
+      loadingActions,
+      pendingConfirmation,
+      execute,
+      confirm,
+      cancel,
+      registerHandler,
+    ],
   );
 
   return (
@@ -186,7 +199,7 @@ export function ActionProvider({
 export function useActions(): ActionContextValue {
   const ctx = useContext(ActionContext);
   if (!ctx) {
-    throw new Error('useActions must be used within an ActionProvider');
+    throw new Error("useActions must be used within an ActionProvider");
   }
   return ctx;
 }
@@ -221,37 +234,41 @@ export interface ConfirmDialogProps {
 /**
  * Default confirmation dialog component
  */
-export function ConfirmDialog({ confirm, onConfirm, onCancel }: ConfirmDialogProps) {
-  const isDanger = confirm.variant === 'danger';
+export function ConfirmDialog({
+  confirm,
+  onConfirm,
+  onCancel,
+}: ConfirmDialogProps) {
+  const isDanger = confirm.variant === "danger";
 
   return (
     <div
       style={{
-        position: 'fixed',
+        position: "fixed",
         inset: 0,
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
+        backgroundColor: "rgba(0, 0, 0, 0.5)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
         zIndex: 50,
       }}
       onClick={onCancel}
     >
       <div
         style={{
-          backgroundColor: 'white',
-          borderRadius: '8px',
-          padding: '24px',
-          maxWidth: '400px',
-          width: '100%',
-          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
+          backgroundColor: "white",
+          borderRadius: "8px",
+          padding: "24px",
+          maxWidth: "400px",
+          width: "100%",
+          boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)",
         }}
         onClick={(e) => e.stopPropagation()}
       >
         <h3
           style={{
-            margin: '0 0 8px 0',
-            fontSize: '18px',
+            margin: "0 0 8px 0",
+            fontSize: "18px",
             fontWeight: 600,
           }}
         >
@@ -259,43 +276,43 @@ export function ConfirmDialog({ confirm, onConfirm, onCancel }: ConfirmDialogPro
         </h3>
         <p
           style={{
-            margin: '0 0 24px 0',
-            color: '#6b7280',
+            margin: "0 0 24px 0",
+            color: "#6b7280",
           }}
         >
           {confirm.message}
         </p>
         <div
           style={{
-            display: 'flex',
-            gap: '12px',
-            justifyContent: 'flex-end',
+            display: "flex",
+            gap: "12px",
+            justifyContent: "flex-end",
           }}
         >
           <button
             onClick={onCancel}
             style={{
-              padding: '8px 16px',
-              borderRadius: '6px',
-              border: '1px solid #d1d5db',
-              backgroundColor: 'white',
-              cursor: 'pointer',
+              padding: "8px 16px",
+              borderRadius: "6px",
+              border: "1px solid #d1d5db",
+              backgroundColor: "white",
+              cursor: "pointer",
             }}
           >
-            {confirm.cancelLabel ?? 'Cancel'}
+            {confirm.cancelLabel ?? "Cancel"}
           </button>
           <button
             onClick={onConfirm}
             style={{
-              padding: '8px 16px',
-              borderRadius: '6px',
-              border: 'none',
-              backgroundColor: isDanger ? '#dc2626' : '#3b82f6',
-              color: 'white',
-              cursor: 'pointer',
+              padding: "8px 16px",
+              borderRadius: "6px",
+              border: "none",
+              backgroundColor: isDanger ? "#dc2626" : "#3b82f6",
+              color: "white",
+              cursor: "pointer",
             }}
           >
-            {confirm.confirmLabel ?? 'Confirm'}
+            {confirm.confirmLabel ?? "Confirm"}
           </button>
         </div>
       </div>

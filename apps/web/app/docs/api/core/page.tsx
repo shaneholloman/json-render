@@ -35,7 +35,9 @@ interface ActionDefinition {
   description?: string;
 }`}</Code>
 
-      <h2 className="text-xl font-semibold mt-12 mb-4">generateCatalogPrompt</h2>
+      <h2 className="text-xl font-semibold mt-12 mb-4">
+        generateCatalogPrompt
+      </h2>
       <p className="text-sm text-muted-foreground mb-4">
         Generates a system prompt for AI models.
       </p>
@@ -64,7 +66,7 @@ type VisibilityCondition =
   | { lte: [DynamicValue, DynamicValue] };`}</Code>
 
       <h2 className="text-xl font-semibold mt-12 mb-4">Types</h2>
-      
+
       <h3 className="text-lg font-semibold mt-8 mb-4">UIElement</h3>
       <Code lang="typescript">{`interface UIElement {
   key: string;

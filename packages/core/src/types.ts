@@ -1,11 +1,9 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 /**
  * Dynamic value - can be a literal or a path reference to data model
  */
-export type DynamicValue<T = unknown> =
-  | T
-  | { path: string };
+export type DynamicValue<T = unknown> = T | { path: string };
 
 /**
  * Dynamic string value
@@ -51,7 +49,10 @@ export const DynamicBooleanSchema = z.union([
 /**
  * Base UI element structure for v2
  */
-export interface UIElement<T extends string = string, P = Record<string, unknown>> {
+export interface UIElement<
+  T extends string = string,
+  P = Record<string, unknown>,
+> {
   /** Unique key for reconciliation */
   key: string;
   /** Component type from the catalog */
@@ -72,7 +73,7 @@ export interface UIElement<T extends string = string, P = Record<string, unknown
 export type VisibilityCondition =
   | boolean
   | { path: string }
-  | { auth: 'signedIn' | 'signedOut' }
+  | { auth: "signedIn" | "signedOut" }
   | LogicExpression;
 
 /**
@@ -121,12 +122,12 @@ export type ComponentSchema = z.ZodType<Record<string, unknown>>;
 /**
  * Validation mode for catalog validation
  */
-export type ValidationMode = 'strict' | 'warn' | 'ignore';
+export type ValidationMode = "strict" | "warn" | "ignore";
 
 /**
  * JSON patch operation types
  */
-export type PatchOp = 'add' | 'remove' | 'replace' | 'set';
+export type PatchOp = "add" | "remove" | "replace" | "set";
 
 /**
  * JSON patch operation
@@ -142,16 +143,16 @@ export interface JsonPatch {
  */
 export function resolveDynamicValue<T>(
   value: DynamicValue<T>,
-  dataModel: DataModel
+  dataModel: DataModel,
 ): T | undefined {
   if (value === null || value === undefined) {
     return undefined;
   }
-  
-  if (typeof value === 'object' && 'path' in value) {
+
+  if (typeof value === "object" && "path" in value) {
     return getByPath(dataModel, value.path) as T | undefined;
   }
-  
+
   return value as T;
 }
 
@@ -159,51 +160,55 @@ export function resolveDynamicValue<T>(
  * Get a value from an object by JSON Pointer path
  */
 export function getByPath(obj: unknown, path: string): unknown {
-  if (!path || path === '/') {
+  if (!path || path === "/") {
     return obj;
   }
-  
-  const segments = path.startsWith('/')
-    ? path.slice(1).split('/')
-    : path.split('/');
-  
+
+  const segments = path.startsWith("/")
+    ? path.slice(1).split("/")
+    : path.split("/");
+
   let current: unknown = obj;
-  
+
   for (const segment of segments) {
     if (current === null || current === undefined) {
       return undefined;
     }
-    
-    if (typeof current === 'object') {
+
+    if (typeof current === "object") {
       current = (current as Record<string, unknown>)[segment];
     } else {
       return undefined;
     }
   }
-  
+
   return current;
 }
 
 /**
  * Set a value in an object by JSON Pointer path
  */
-export function setByPath(obj: Record<string, unknown>, path: string, value: unknown): void {
-  const segments = path.startsWith('/')
-    ? path.slice(1).split('/')
-    : path.split('/');
-  
+export function setByPath(
+  obj: Record<string, unknown>,
+  path: string,
+  value: unknown,
+): void {
+  const segments = path.startsWith("/")
+    ? path.slice(1).split("/")
+    : path.split("/");
+
   if (segments.length === 0) return;
-  
+
   let current: Record<string, unknown> = obj;
-  
+
   for (let i = 0; i < segments.length - 1; i++) {
     const segment = segments[i]!;
-    if (!(segment in current) || typeof current[segment] !== 'object') {
+    if (!(segment in current) || typeof current[segment] !== "object") {
       current[segment] = {};
     }
     current = current[segment] as Record<string, unknown>;
   }
-  
+
   const lastSegment = segments[segments.length - 1]!;
   current[lastSegment] = value;
 }

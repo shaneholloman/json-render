@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import React, {
   createContext,
@@ -7,13 +7,13 @@ import React, {
   useCallback,
   useMemo,
   type ReactNode,
-} from 'react';
+} from "react";
 import {
   getByPath,
   setByPath,
   type DataModel,
   type AuthState,
-} from '@json-render/core';
+} from "@json-render/core";
 
 /**
  * Data context value
@@ -57,10 +57,7 @@ export function DataProvider({
 }: DataProviderProps) {
   const [data, setData] = useState<DataModel>(initialData);
 
-  const get = useCallback(
-    (path: string) => getByPath(data, path),
-    [data]
-  );
+  const get = useCallback((path: string) => getByPath(data, path), [data]);
 
   const set = useCallback(
     (path: string, value: unknown) => {
@@ -71,7 +68,7 @@ export function DataProvider({
       });
       onDataChange?.(path, value);
     },
-    [onDataChange]
+    [onDataChange],
   );
 
   const update = useCallback(
@@ -85,7 +82,7 @@ export function DataProvider({
         return next;
       });
     },
-    [onDataChange]
+    [onDataChange],
   );
 
   const value = useMemo<DataContextValue>(
@@ -96,7 +93,7 @@ export function DataProvider({
       set,
       update,
     }),
-    [data, authState, get, set, update]
+    [data, authState, get, set, update],
   );
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;
@@ -108,7 +105,7 @@ export function DataProvider({
 export function useData(): DataContextValue {
   const ctx = useContext(DataContext);
   if (!ctx) {
-    throw new Error('useData must be used within a DataProvider');
+    throw new Error("useData must be used within a DataProvider");
   }
   return ctx;
 }
@@ -125,13 +122,13 @@ export function useDataValue<T>(path: string): T | undefined {
  * Hook to get and set a value from the data model (like useState)
  */
 export function useDataBinding<T>(
-  path: string
+  path: string,
 ): [T | undefined, (value: T) => void] {
   const { get, set } = useData();
   const value = get(path) as T | undefined;
   const setValue = useCallback(
     (newValue: T) => set(path, newValue),
-    [path, set]
+    [path, set],
   );
   return [value, setValue];
 }

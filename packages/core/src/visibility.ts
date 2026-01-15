@@ -1,12 +1,12 @@
-import { z } from 'zod';
+import { z } from "zod";
 import type {
   VisibilityCondition,
   LogicExpression,
   DataModel,
   AuthState,
   DynamicValue,
-} from './types';
-import { resolveDynamicValue, DynamicValueSchema } from './types';
+} from "./types";
+import { resolveDynamicValue, DynamicValueSchema } from "./types";
 
 // Dynamic value schema for comparisons (number-focused)
 const DynamicNumberValueSchema = z.union([
@@ -26,22 +26,31 @@ export const LogicExpressionSchema: z.ZodType<LogicExpression> = z.lazy(() =>
     z.object({ path: z.string() }),
     z.object({ eq: z.tuple([DynamicValueSchema, DynamicValueSchema]) }),
     z.object({ neq: z.tuple([DynamicValueSchema, DynamicValueSchema]) }),
-    z.object({ gt: z.tuple([DynamicNumberValueSchema, DynamicNumberValueSchema]) }),
-    z.object({ gte: z.tuple([DynamicNumberValueSchema, DynamicNumberValueSchema]) }),
-    z.object({ lt: z.tuple([DynamicNumberValueSchema, DynamicNumberValueSchema]) }),
-    z.object({ lte: z.tuple([DynamicNumberValueSchema, DynamicNumberValueSchema]) }),
-  ])
+    z.object({
+      gt: z.tuple([DynamicNumberValueSchema, DynamicNumberValueSchema]),
+    }),
+    z.object({
+      gte: z.tuple([DynamicNumberValueSchema, DynamicNumberValueSchema]),
+    }),
+    z.object({
+      lt: z.tuple([DynamicNumberValueSchema, DynamicNumberValueSchema]),
+    }),
+    z.object({
+      lte: z.tuple([DynamicNumberValueSchema, DynamicNumberValueSchema]),
+    }),
+  ]),
 ) as z.ZodType<LogicExpression>;
 
 /**
  * Visibility condition schema
  */
-export const VisibilityConditionSchema: z.ZodType<VisibilityCondition> = z.union([
-  z.boolean(),
-  z.object({ path: z.string() }),
-  z.object({ auth: z.enum(['signedIn', 'signedOut']) }),
-  LogicExpressionSchema,
-]);
+export const VisibilityConditionSchema: z.ZodType<VisibilityCondition> =
+  z.union([
+    z.boolean(),
+    z.object({ path: z.string() }),
+    z.object({ auth: z.enum(["signedIn", "signedOut"]) }),
+    LogicExpressionSchema,
+  ]);
 
 /**
  * Context for evaluating visibility
@@ -56,33 +65,33 @@ export interface VisibilityContext {
  */
 export function evaluateLogicExpression(
   expr: LogicExpression,
-  ctx: VisibilityContext
+  ctx: VisibilityContext,
 ): boolean {
   const { dataModel } = ctx;
 
   // AND expression
-  if ('and' in expr) {
+  if ("and" in expr) {
     return expr.and.every((subExpr) => evaluateLogicExpression(subExpr, ctx));
   }
 
   // OR expression
-  if ('or' in expr) {
+  if ("or" in expr) {
     return expr.or.some((subExpr) => evaluateLogicExpression(subExpr, ctx));
   }
 
   // NOT expression
-  if ('not' in expr) {
+  if ("not" in expr) {
     return !evaluateLogicExpression(expr.not, ctx);
   }
 
   // Path expression (resolve to boolean)
-  if ('path' in expr) {
+  if ("path" in expr) {
     const value = resolveDynamicValue({ path: expr.path }, dataModel);
     return Boolean(value);
   }
 
   // Equality comparison
-  if ('eq' in expr) {
+  if ("eq" in expr) {
     const [left, right] = expr.eq;
     const leftValue = resolveDynamicValue(left, dataModel);
     const rightValue = resolveDynamicValue(right, dataModel);
@@ -90,7 +99,7 @@ export function evaluateLogicExpression(
   }
 
   // Not equal comparison
-  if ('neq' in expr) {
+  if ("neq" in expr) {
     const [left, right] = expr.neq;
     const leftValue = resolveDynamicValue(left, dataModel);
     const rightValue = resolveDynamicValue(right, dataModel);
@@ -98,44 +107,68 @@ export function evaluateLogicExpression(
   }
 
   // Greater than
-  if ('gt' in expr) {
+  if ("gt" in expr) {
     const [left, right] = expr.gt;
-    const leftValue = resolveDynamicValue(left as DynamicValue<number>, dataModel);
-    const rightValue = resolveDynamicValue(right as DynamicValue<number>, dataModel);
-    if (typeof leftValue === 'number' && typeof rightValue === 'number') {
+    const leftValue = resolveDynamicValue(
+      left as DynamicValue<number>,
+      dataModel,
+    );
+    const rightValue = resolveDynamicValue(
+      right as DynamicValue<number>,
+      dataModel,
+    );
+    if (typeof leftValue === "number" && typeof rightValue === "number") {
       return leftValue > rightValue;
     }
     return false;
   }
 
   // Greater than or equal
-  if ('gte' in expr) {
+  if ("gte" in expr) {
     const [left, right] = expr.gte;
-    const leftValue = resolveDynamicValue(left as DynamicValue<number>, dataModel);
-    const rightValue = resolveDynamicValue(right as DynamicValue<number>, dataModel);
-    if (typeof leftValue === 'number' && typeof rightValue === 'number') {
+    const leftValue = resolveDynamicValue(
+      left as DynamicValue<number>,
+      dataModel,
+    );
+    const rightValue = resolveDynamicValue(
+      right as DynamicValue<number>,
+      dataModel,
+    );
+    if (typeof leftValue === "number" && typeof rightValue === "number") {
       return leftValue >= rightValue;
     }
     return false;
   }
 
   // Less than
-  if ('lt' in expr) {
+  if ("lt" in expr) {
     const [left, right] = expr.lt;
-    const leftValue = resolveDynamicValue(left as DynamicValue<number>, dataModel);
-    const rightValue = resolveDynamicValue(right as DynamicValue<number>, dataModel);
-    if (typeof leftValue === 'number' && typeof rightValue === 'number') {
+    const leftValue = resolveDynamicValue(
+      left as DynamicValue<number>,
+      dataModel,
+    );
+    const rightValue = resolveDynamicValue(
+      right as DynamicValue<number>,
+      dataModel,
+    );
+    if (typeof leftValue === "number" && typeof rightValue === "number") {
       return leftValue < rightValue;
     }
     return false;
   }
 
   // Less than or equal
-  if ('lte' in expr) {
+  if ("lte" in expr) {
     const [left, right] = expr.lte;
-    const leftValue = resolveDynamicValue(left as DynamicValue<number>, dataModel);
-    const rightValue = resolveDynamicValue(right as DynamicValue<number>, dataModel);
-    if (typeof leftValue === 'number' && typeof rightValue === 'number') {
+    const leftValue = resolveDynamicValue(
+      left as DynamicValue<number>,
+      dataModel,
+    );
+    const rightValue = resolveDynamicValue(
+      right as DynamicValue<number>,
+      dataModel,
+    );
+    if (typeof leftValue === "number" && typeof rightValue === "number") {
       return leftValue <= rightValue;
     }
     return false;
@@ -149,7 +182,7 @@ export function evaluateLogicExpression(
  */
 export function evaluateVisibility(
   condition: VisibilityCondition | undefined,
-  ctx: VisibilityContext
+  ctx: VisibilityContext,
 ): boolean {
   // No condition = visible
   if (condition === undefined) {
@@ -157,23 +190,23 @@ export function evaluateVisibility(
   }
 
   // Boolean literal
-  if (typeof condition === 'boolean') {
+  if (typeof condition === "boolean") {
     return condition;
   }
 
   // Path reference
-  if ('path' in condition && !('and' in condition) && !('or' in condition)) {
+  if ("path" in condition && !("and" in condition) && !("or" in condition)) {
     const value = resolveDynamicValue({ path: condition.path }, ctx.dataModel);
     return Boolean(value);
   }
 
   // Auth condition
-  if ('auth' in condition) {
+  if ("auth" in condition) {
     const isSignedIn = ctx.authState?.isSignedIn ?? false;
-    if (condition.auth === 'signedIn') {
+    if (condition.auth === "signedIn") {
       return isSignedIn;
     }
-    if (condition.auth === 'signedOut') {
+    if (condition.auth === "signedOut") {
       return !isSignedIn;
     }
     return false;
@@ -189,43 +222,63 @@ export function evaluateVisibility(
 export const visibility = {
   /** Always visible */
   always: true as const,
-  
+
   /** Never visible */
   never: false as const,
-  
+
   /** Visible when path is truthy */
   when: (path: string): VisibilityCondition => ({ path }),
-  
+
   /** Visible when signed in */
-  signedIn: { auth: 'signedIn' } as const,
-  
+  signedIn: { auth: "signedIn" } as const,
+
   /** Visible when signed out */
-  signedOut: { auth: 'signedOut' } as const,
-  
+  signedOut: { auth: "signedOut" } as const,
+
   /** AND multiple conditions */
-  and: (...conditions: LogicExpression[]): LogicExpression => ({ and: conditions }),
-  
+  and: (...conditions: LogicExpression[]): LogicExpression => ({
+    and: conditions,
+  }),
+
   /** OR multiple conditions */
-  or: (...conditions: LogicExpression[]): LogicExpression => ({ or: conditions }),
-  
+  or: (...conditions: LogicExpression[]): LogicExpression => ({
+    or: conditions,
+  }),
+
   /** NOT a condition */
   not: (condition: LogicExpression): LogicExpression => ({ not: condition }),
-  
+
   /** Equality check */
-  eq: (left: DynamicValue, right: DynamicValue): LogicExpression => ({ eq: [left, right] }),
-  
+  eq: (left: DynamicValue, right: DynamicValue): LogicExpression => ({
+    eq: [left, right],
+  }),
+
   /** Not equal check */
-  neq: (left: DynamicValue, right: DynamicValue): LogicExpression => ({ neq: [left, right] }),
-  
+  neq: (left: DynamicValue, right: DynamicValue): LogicExpression => ({
+    neq: [left, right],
+  }),
+
   /** Greater than */
-  gt: (left: DynamicValue<number>, right: DynamicValue<number>): LogicExpression => ({ gt: [left, right] }),
-  
+  gt: (
+    left: DynamicValue<number>,
+    right: DynamicValue<number>,
+  ): LogicExpression => ({ gt: [left, right] }),
+
   /** Greater than or equal */
-  gte: (left: DynamicValue<number>, right: DynamicValue<number>): LogicExpression => ({ gte: [left, right] }),
-  
+  gte: (
+    left: DynamicValue<number>,
+    right: DynamicValue<number>,
+  ): LogicExpression => ({ gte: [left, right] }),
+
   /** Less than */
-  lt: (left: DynamicValue<number>, right: DynamicValue<number>): LogicExpression => ({ lt: [left, right] }),
-  
+  lt: (
+    left: DynamicValue<number>,
+    right: DynamicValue<number>,
+  ): LogicExpression => ({ lt: [left, right] }),
+
   /** Less than or equal */
-  lte: (left: DynamicValue<number>, right: DynamicValue<number>): LogicExpression => ({ lte: [left, right] }),
+  lte: (
+    left: DynamicValue<number>,
+    right: DynamicValue<number>,
+  ): LogicExpression => ({ lte: [left, right] }),
 };

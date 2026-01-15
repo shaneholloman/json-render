@@ -1,4 +1,4 @@
-import { streamText } from 'ai';
+import { streamText } from "ai";
 
 export const maxDuration = 30;
 
@@ -82,10 +82,10 @@ const MAX_PROMPT_LENGTH = 140;
 export async function POST(req: Request) {
   const { prompt } = await req.json();
 
-  const sanitizedPrompt = String(prompt || '').slice(0, MAX_PROMPT_LENGTH);
+  const sanitizedPrompt = String(prompt || "").slice(0, MAX_PROMPT_LENGTH);
 
   const result = streamText({
-    model: 'anthropic/claude-opus-4.5',
+    model: "anthropic/claude-opus-4.5",
     system: SYSTEM_PROMPT,
     prompt: sanitizedPrompt,
     temperature: 0.7,

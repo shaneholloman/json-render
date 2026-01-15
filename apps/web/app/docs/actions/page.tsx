@@ -15,8 +15,9 @@ export default function ActionsPage() {
 
       <h2 className="text-xl font-semibold mt-12 mb-4">Why Named Actions?</h2>
       <p className="text-sm text-muted-foreground mb-4">
-        Instead of AI generating arbitrary code, it declares <em>intent</em> by name. 
-        Your application provides the implementation. This is a core guardrail.
+        Instead of AI generating arbitrary code, it declares <em>intent</em> by
+        name. Your application provides the implementation. This is a core
+        guardrail.
       </p>
 
       <h2 className="text-xl font-semibold mt-12 mb-4">Defining Actions</h2>
@@ -81,7 +82,9 @@ function App() {
   );
 }`}</Code>
 
-      <h2 className="text-xl font-semibold mt-12 mb-4">Using Actions in Components</h2>
+      <h2 className="text-xl font-semibold mt-12 mb-4">
+        Using Actions in Components
+      </h2>
       <Code lang="tsx">{`const Button = ({ element, onAction }) => (
   <button onClick={() => onAction(element.props.action, {})}>
     {element.props.label}
@@ -101,7 +104,9 @@ function SubmitButton() {
   );
 }`}</Code>
 
-      <h2 className="text-xl font-semibold mt-12 mb-4">Actions with Confirmation</h2>
+      <h2 className="text-xl font-semibold mt-12 mb-4">
+        Actions with Confirmation
+      </h2>
       <p className="text-sm text-muted-foreground mb-4">
         AI can declare actions that require user confirmation:
       </p>
@@ -144,7 +149,14 @@ function SubmitButton() {
 
       <h2 className="text-xl font-semibold mt-12 mb-4">Next</h2>
       <p className="text-sm text-muted-foreground">
-        Learn about <Link href="/docs/visibility" className="text-foreground hover:underline">conditional visibility</Link>.
+        Learn about{" "}
+        <Link
+          href="/docs/visibility"
+          className="text-foreground hover:underline"
+        >
+          conditional visibility
+        </Link>
+        .
       </p>
     </article>
   );

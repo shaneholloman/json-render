@@ -1,19 +1,21 @@
-import { z } from 'zod';
+import { z } from "zod";
 import type {
   ComponentSchema,
   ValidationMode,
   UIElement,
   UITree,
   VisibilityCondition,
-} from './types';
-import { VisibilityConditionSchema } from './visibility';
-import { ActionSchema, type ActionDefinition } from './actions';
-import { ValidationConfigSchema, type ValidationFunction } from './validation';
+} from "./types";
+import { VisibilityConditionSchema } from "./visibility";
+import { ActionSchema, type ActionDefinition } from "./actions";
+import { ValidationConfigSchema, type ValidationFunction } from "./validation";
 
 /**
  * Component definition with visibility and validation support
  */
-export interface ComponentDefinition<TProps extends ComponentSchema = ComponentSchema> {
+export interface ComponentDefinition<
+  TProps extends ComponentSchema = ComponentSchema,
+> {
   /** Zod schema for component props */
   props: TProps;
   /** Whether this component can have children */
@@ -26,9 +28,18 @@ export interface ComponentDefinition<TProps extends ComponentSchema = ComponentS
  * Catalog configuration
  */
 export interface CatalogConfig<
-  TComponents extends Record<string, ComponentDefinition> = Record<string, ComponentDefinition>,
-  TActions extends Record<string, ActionDefinition> = Record<string, ActionDefinition>,
-  TFunctions extends Record<string, ValidationFunction> = Record<string, ValidationFunction>
+  TComponents extends Record<string, ComponentDefinition> = Record<
+    string,
+    ComponentDefinition
+  >,
+  TActions extends Record<string, ActionDefinition> = Record<
+    string,
+    ActionDefinition
+  >,
+  TFunctions extends Record<string, ValidationFunction> = Record<
+    string,
+    ValidationFunction
+  >,
 > {
   /** Catalog name */
   name?: string;
@@ -46,9 +57,18 @@ export interface CatalogConfig<
  * Catalog instance
  */
 export interface Catalog<
-  TComponents extends Record<string, ComponentDefinition> = Record<string, ComponentDefinition>,
-  TActions extends Record<string, ActionDefinition> = Record<string, ActionDefinition>,
-  TFunctions extends Record<string, ValidationFunction> = Record<string, ValidationFunction>
+  TComponents extends Record<string, ComponentDefinition> = Record<
+    string,
+    ComponentDefinition
+  >,
+  TActions extends Record<string, ActionDefinition> = Record<
+    string,
+    ActionDefinition
+  >,
+  TFunctions extends Record<string, ValidationFunction> = Record<
+    string,
+    ValidationFunction
+  >,
 > {
   /** Catalog name */
   readonly name: string;
@@ -77,9 +97,17 @@ export interface Catalog<
   /** Check if function exists */
   hasFunction(name: string): boolean;
   /** Validate an element */
-  validateElement(element: unknown): { success: boolean; data?: UIElement; error?: z.ZodError };
+  validateElement(element: unknown): {
+    success: boolean;
+    data?: UIElement;
+    error?: z.ZodError;
+  };
   /** Validate a UI tree */
-  validateTree(tree: unknown): { success: boolean; data?: UITree; error?: z.ZodError };
+  validateTree(tree: unknown): {
+    success: boolean;
+    data?: UITree;
+    error?: z.ZodError;
+  };
 }
 
 /**
@@ -87,17 +115,23 @@ export interface Catalog<
  */
 export function createCatalog<
   TComponents extends Record<string, ComponentDefinition>,
-  TActions extends Record<string, ActionDefinition> = Record<string, ActionDefinition>,
-  TFunctions extends Record<string, ValidationFunction> = Record<string, ValidationFunction>
+  TActions extends Record<string, ActionDefinition> = Record<
+    string,
+    ActionDefinition
+  >,
+  TFunctions extends Record<string, ValidationFunction> = Record<
+    string,
+    ValidationFunction
+  >,
 >(
-  config: CatalogConfig<TComponents, TActions, TFunctions>
+  config: CatalogConfig<TComponents, TActions, TFunctions>,
 ): Catalog<TComponents, TActions, TFunctions> {
   const {
-    name = 'unnamed',
+    name = "unnamed",
     components,
     actions = {} as TActions,
     functions = {} as TFunctions,
-    validation = 'strict',
+    validation = "strict",
   } = config;
 
   const componentNames = Object.keys(components) as (keyof TComponents)[];
@@ -107,7 +141,7 @@ export function createCatalog<
   // Create element schema for each component type
   const componentSchemas = componentNames.map((componentName) => {
     const def = components[componentName]!;
-    
+
     return z.object({
       key: z.string(),
       type: z.literal(componentName as string),
@@ -120,7 +154,7 @@ export function createCatalog<
 
   // Create union schema for all components
   let elementSchema: z.ZodType<UIElement>;
-  
+
   if (componentSchemas.length === 0) {
     elementSchema = z.object({
       key: z.string(),
@@ -133,10 +167,10 @@ export function createCatalog<
   } else if (componentSchemas.length === 1) {
     elementSchema = componentSchemas[0] as unknown as z.ZodType<UIElement>;
   } else {
-    elementSchema = z.discriminatedUnion('type', [
+    elementSchema = z.discriminatedUnion("type", [
       componentSchemas[0] as z.ZodObject<any>,
       componentSchemas[1] as z.ZodObject<any>,
-      ...componentSchemas.slice(2) as z.ZodObject<any>[],
+      ...(componentSchemas.slice(2) as z.ZodObject<any>[]),
     ]) as unknown as z.ZodType<UIElement>;
   }
 
@@ -194,13 +228,13 @@ export function createCatalog<
 export function generateCatalogPrompt<
   TComponents extends Record<string, ComponentDefinition>,
   TActions extends Record<string, ActionDefinition>,
-  TFunctions extends Record<string, ValidationFunction>
+  TFunctions extends Record<string, ValidationFunction>,
 >(catalog: Catalog<TComponents, TActions, TFunctions>): string {
   const lines: string[] = [
     `# ${catalog.name} Component Catalog`,
-    '',
-    '## Available Components',
-    '',
+    "",
+    "## Available Components",
+    "",
   ];
 
   // Components
@@ -210,50 +244,54 @@ export function generateCatalogPrompt<
     if (def.description) {
       lines.push(def.description);
     }
-    lines.push('');
+    lines.push("");
   }
 
   // Actions
   if (catalog.actionNames.length > 0) {
-    lines.push('## Available Actions');
-    lines.push('');
+    lines.push("## Available Actions");
+    lines.push("");
     for (const name of catalog.actionNames) {
       const def = catalog.actions[name]!;
-      lines.push(`- \`${String(name)}\`${def.description ? `: ${def.description}` : ''}`);
+      lines.push(
+        `- \`${String(name)}\`${def.description ? `: ${def.description}` : ""}`,
+      );
     }
-    lines.push('');
+    lines.push("");
   }
 
   // Visibility
-  lines.push('## Visibility Conditions');
-  lines.push('');
-  lines.push('Components can have a `visible` property:');
-  lines.push('- `true` / `false` - Always visible/hidden');
+  lines.push("## Visibility Conditions");
+  lines.push("");
+  lines.push("Components can have a `visible` property:");
+  lines.push("- `true` / `false` - Always visible/hidden");
   lines.push('- `{ "path": "/data/path" }` - Visible when path is truthy');
   lines.push('- `{ "auth": "signedIn" }` - Visible when user is signed in');
   lines.push('- `{ "and": [...] }` - All conditions must be true');
   lines.push('- `{ "or": [...] }` - Any condition must be true');
   lines.push('- `{ "not": {...} }` - Negates a condition');
   lines.push('- `{ "eq": [a, b] }` - Equality check');
-  lines.push('');
+  lines.push("");
 
   // Validation
-  lines.push('## Validation Functions');
-  lines.push('');
-  lines.push('Built-in: `required`, `email`, `minLength`, `maxLength`, `pattern`, `min`, `max`, `url`');
+  lines.push("## Validation Functions");
+  lines.push("");
+  lines.push(
+    "Built-in: `required`, `email`, `minLength`, `maxLength`, `pattern`, `min`, `max`, `url`",
+  );
   if (catalog.functionNames.length > 0) {
-    lines.push(`Custom: ${catalog.functionNames.map(String).join(', ')}`);
+    lines.push(`Custom: ${catalog.functionNames.map(String).join(", ")}`);
   }
-  lines.push('');
+  lines.push("");
 
-  return lines.join('\n');
+  return lines.join("\n");
 }
 
 /**
  * Type helper to infer component props from catalog
  */
 export type InferCatalogComponentProps<
-  C extends Catalog<Record<string, ComponentDefinition>>
+  C extends Catalog<Record<string, ComponentDefinition>>,
 > = {
-  [K in keyof C['components']]: z.infer<C['components'][K]['props']>;
+  [K in keyof C["components"]]: z.infer<C["components"][K]["props"]>;
 };

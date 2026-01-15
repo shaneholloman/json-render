@@ -26,8 +26,11 @@ export function LineGraph({ element }: ComponentRenderProps) {
 
   // Calculate points for the SVG path
   const points = data.map((d, i) => {
-    const x = padding.left + (data.length > 1 ? (i / (data.length - 1)) * chartWidth : chartWidth / 2);
-    const y = padding.top + chartHeight - ((d.value - minValue) / range) * chartHeight;
+    const x =
+      padding.left +
+      (data.length > 1 ? (i / (data.length - 1)) * chartWidth : chartWidth / 2);
+    const y =
+      padding.top + chartHeight - ((d.value - minValue) / range) * chartHeight;
     return { x, y, ...d };
   });
 
@@ -42,10 +45,7 @@ export function LineGraph({ element }: ComponentRenderProps) {
         <div className="text-xs font-medium mb-2 text-left">{title}</div>
       ) : null}
       <div className="relative h-24">
-        <svg
-          viewBox={`0 0 ${width} ${height}`}
-          className="w-full h-full"
-        >
+        <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-full">
           {/* Grid lines */}
           <line
             x1={padding.left}

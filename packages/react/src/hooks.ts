@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useState, useCallback, useRef, useEffect } from 'react';
-import type { UITree, UIElement, JsonPatch } from '@json-render/core';
-import { setByPath } from '@json-render/core';
+import { useState, useCallback, useRef, useEffect } from "react";
+import type { UITree, UIElement, JsonPatch } from "@json-render/core";
+import { setByPath } from "@json-render/core";
 
 /**
  * Parse a single JSON patch line
@@ -10,7 +10,7 @@ import { setByPath } from '@json-render/core';
 function parsePatchLine(line: string): JsonPatch | null {
   try {
     const trimmed = line.trim();
-    if (!trimmed || trimmed.startsWith('//')) {
+    if (!trimmed || trimmed.startsWith("//")) {
       return null;
     }
     return JSON.parse(trimmed) as JsonPatch;
@@ -26,18 +26,18 @@ function applyPatch(tree: UITree, patch: JsonPatch): UITree {
   const newTree = { ...tree, elements: { ...tree.elements } };
 
   switch (patch.op) {
-    case 'set':
-    case 'add':
-    case 'replace': {
+    case "set":
+    case "add":
+    case "replace": {
       // Handle root path
-      if (patch.path === '/root') {
+      if (patch.path === "/root") {
         newTree.root = patch.value as string;
         return newTree;
       }
 
       // Handle elements paths
-      if (patch.path.startsWith('/elements/')) {
-        const pathParts = patch.path.slice('/elements/'.length).split('/');
+      if (patch.path.startsWith("/elements/")) {
+        const pathParts = patch.path.slice("/elements/".length).split("/");
         const elementKey = pathParts[0];
 
         if (!elementKey) return newTree;
@@ -49,18 +49,22 @@ function applyPatch(tree: UITree, patch: JsonPatch): UITree {
           // Setting property of element
           const element = newTree.elements[elementKey];
           if (element) {
-            const propPath = '/' + pathParts.slice(1).join('/');
+            const propPath = "/" + pathParts.slice(1).join("/");
             const newElement = { ...element };
-            setByPath(newElement as unknown as Record<string, unknown>, propPath, patch.value);
+            setByPath(
+              newElement as unknown as Record<string, unknown>,
+              propPath,
+              patch.value,
+            );
             newTree.elements[elementKey] = newElement;
           }
         }
       }
       break;
     }
-    case 'remove': {
-      if (patch.path.startsWith('/elements/')) {
-        const elementKey = patch.path.slice('/elements/'.length).split('/')[0];
+    case "remove": {
+      if (patch.path.startsWith("/elements/")) {
+        const elementKey = patch.path.slice("/elements/".length).split("/")[0];
         if (elementKey) {
           const { [elementKey]: _, ...rest } = newTree.elements;
           newTree.elements = rest;
@@ -129,13 +133,13 @@ export function useUIStream({
       setError(null);
 
       // Start with an empty tree
-      let currentTree: UITree = { root: '', elements: {} };
+      let currentTree: UITree = { root: "", elements: {} };
       setTree(currentTree);
 
       try {
         const response = await fetch(api, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             prompt,
             context,
@@ -150,11 +154,11 @@ export function useUIStream({
 
         const reader = response.body?.getReader();
         if (!reader) {
-          throw new Error('No response body');
+          throw new Error("No response body");
         }
 
         const decoder = new TextDecoder();
-        let buffer = '';
+        let buffer = "";
 
         while (true) {
           const { done, value } = await reader.read();
@@ -163,8 +167,8 @@ export function useUIStream({
           buffer += decoder.decode(value, { stream: true });
 
           // Process complete lines
-          const lines = buffer.split('\n');
-          buffer = lines.pop() ?? '';
+          const lines = buffer.split("\n");
+          buffer = lines.pop() ?? "";
 
           for (const line of lines) {
             const patch = parsePatchLine(line);
@@ -186,7 +190,7 @@ export function useUIStream({
 
         onComplete?.(currentTree);
       } catch (err) {
-        if ((err as Error).name === 'AbortError') {
+        if ((err as Error).name === "AbortError") {
           return;
         }
         const error = err instanceof Error ? err : new Error(String(err));
@@ -196,7 +200,7 @@ export function useUIStream({
         setIsStreaming(false);
       }
     },
-    [api, onComplete, onError]
+    [api, onComplete, onError],
   );
 
   // Cleanup on unmount
@@ -219,10 +223,10 @@ export function useUIStream({
  * Convert a flat element list to a UITree
  */
 export function flatToTree(
-  elements: Array<UIElement & { parentKey?: string | null }>
+  elements: Array<UIElement & { parentKey?: string | null }>,
 ): UITree {
   const elementMap: Record<string, UIElement> = {};
-  let root = '';
+  let root = "";
 
   // First pass: add all elements to map
   for (const element of elements) {

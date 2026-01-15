@@ -1,6 +1,6 @@
-import { z } from 'zod';
-import type { DynamicValue, DataModel } from './types';
-import { DynamicValueSchema, resolveDynamicValue } from './types';
+import { z } from "zod";
+import type { DynamicValue, DataModel } from "./types";
+import { DynamicValueSchema, resolveDynamicValue } from "./types";
 
 /**
  * Confirmation dialog configuration
@@ -10,7 +10,7 @@ export interface ActionConfirm {
   message: string;
   confirmLabel?: string;
   cancelLabel?: string;
-  variant?: 'default' | 'danger';
+  variant?: "default" | "danger";
 }
 
 /**
@@ -52,7 +52,7 @@ export const ActionConfirmSchema = z.object({
   message: z.string(),
   confirmLabel: z.string().optional(),
   cancelLabel: z.string().optional(),
-  variant: z.enum(['default', 'danger']).optional(),
+  variant: z.enum(["default", "danger"]).optional(),
 });
 
 /**
@@ -86,9 +86,10 @@ export const ActionSchema = z.object({
 /**
  * Action handler function signature
  */
-export type ActionHandler<TParams = Record<string, unknown>, TResult = unknown> = (
-  params: TParams
-) => Promise<TResult> | TResult;
+export type ActionHandler<
+  TParams = Record<string, unknown>,
+  TResult = unknown,
+> = (params: TParams) => Promise<TResult> | TResult;
 
 /**
  * Action definition in catalog
@@ -114,15 +115,18 @@ export interface ResolvedAction {
 /**
  * Resolve all dynamic values in an action
  */
-export function resolveAction(action: Action, dataModel: DataModel): ResolvedAction {
+export function resolveAction(
+  action: Action,
+  dataModel: DataModel,
+): ResolvedAction {
   const resolvedParams: Record<string, unknown> = {};
-  
+
   if (action.params) {
     for (const [key, value] of Object.entries(action.params)) {
       resolvedParams[key] = resolveDynamicValue(value, dataModel);
     }
   }
-  
+
   // Interpolate confirmation message if present
   let confirm = action.confirm;
   if (confirm) {
@@ -132,7 +136,7 @@ export function resolveAction(action: Action, dataModel: DataModel): ResolvedAct
       title: interpolateString(confirm.title, dataModel),
     };
   }
-  
+
   return {
     name: action.name,
     params: resolvedParams,
@@ -145,10 +149,13 @@ export function resolveAction(action: Action, dataModel: DataModel): ResolvedAct
 /**
  * Interpolate ${path} expressions in a string
  */
-export function interpolateString(template: string, dataModel: DataModel): string {
+export function interpolateString(
+  template: string,
+  dataModel: DataModel,
+): string {
   return template.replace(/\$\{([^}]+)\}/g, (_, path) => {
     const value = resolveDynamicValue({ path }, dataModel);
-    return String(value ?? '');
+    return String(value ?? "");
   });
 }
 
@@ -171,36 +178,39 @@ export interface ActionExecutionContext {
 /**
  * Execute an action with all callbacks
  */
-export async function executeAction(ctx: ActionExecutionContext): Promise<void> {
+export async function executeAction(
+  ctx: ActionExecutionContext,
+): Promise<void> {
   const { action, handler, setData, navigate, executeAction } = ctx;
-  
+
   try {
     await handler(action.params);
-    
+
     // Handle success
     if (action.onSuccess) {
-      if ('navigate' in action.onSuccess && navigate) {
+      if ("navigate" in action.onSuccess && navigate) {
         navigate(action.onSuccess.navigate);
-      } else if ('set' in action.onSuccess) {
+      } else if ("set" in action.onSuccess) {
         for (const [path, value] of Object.entries(action.onSuccess.set)) {
           setData(path, value);
         }
-      } else if ('action' in action.onSuccess && executeAction) {
+      } else if ("action" in action.onSuccess && executeAction) {
         await executeAction(action.onSuccess.action);
       }
     }
   } catch (error) {
     // Handle error
     if (action.onError) {
-      if ('set' in action.onError) {
+      if ("set" in action.onError) {
         for (const [path, value] of Object.entries(action.onError.set)) {
           // Replace $error.message with actual error
-          const resolvedValue = typeof value === 'string' && value === '$error.message'
-            ? (error as Error).message
-            : value;
+          const resolvedValue =
+            typeof value === "string" && value === "$error.message"
+              ? (error as Error).message
+              : value;
           setData(path, resolvedValue);
         }
-      } else if ('action' in action.onError && executeAction) {
+      } else if ("action" in action.onError && executeAction) {
         await executeAction(action.onError.action);
       }
     } else {
@@ -218,23 +228,23 @@ export const action = {
     name,
     params,
   }),
-  
+
   /** Create an action with confirmation */
   withConfirm: (
     name: string,
     confirm: ActionConfirm,
-    params?: Record<string, DynamicValue>
+    params?: Record<string, DynamicValue>,
   ): Action => ({
     name,
     params,
     confirm,
   }),
-  
+
   /** Create an action with success handler */
   withSuccess: (
     name: string,
     onSuccess: ActionOnSuccess,
-    params?: Record<string, DynamicValue>
+    params?: Record<string, DynamicValue>,
   ): Action => ({
     name,
     params,

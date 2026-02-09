@@ -1,7 +1,8 @@
 import { z } from "zod";
+import type { ActionBinding } from "./actions";
 
 /**
- * Dynamic value - can be a literal or a path reference to data model
+ * Dynamic value - can be a literal or a path reference to state model
  */
 export type DynamicValue<T = unknown> = T | { path: string };
 
@@ -61,6 +62,10 @@ export interface UIElement<
   children?: string[];
   /** Visibility condition */
   visible?: VisibilityCondition;
+  /** Event bindings — maps event names to action bindings */
+  on?: Record<string, ActionBinding | ActionBinding[]>;
+  /** Repeat children once per item in a state array */
+  repeat?: { path: string; key?: string };
 }
 
 /**
@@ -110,6 +115,9 @@ export interface Spec {
   root: string;
   /** Flat map of elements by key */
   elements: Record<string, UIElement>;
+  /** Optional initial state to seed the state model.
+   *  Components using statePath will read from / write to this state. */
+  state?: Record<string, unknown>;
 }
 
 /**
@@ -121,9 +129,9 @@ export interface AuthState {
 }
 
 /**
- * Data model type
+ * State model type
  */
-export type DataModel = Record<string, unknown>;
+export type StateModel = Record<string, unknown>;
 
 /**
  * Component schema definition using Zod
@@ -153,18 +161,18 @@ export interface JsonPatch {
 }
 
 /**
- * Resolve a dynamic value against a data model
+ * Resolve a dynamic value against a state model
  */
 export function resolveDynamicValue<T>(
   value: DynamicValue<T>,
-  dataModel: DataModel,
+  stateModel: StateModel,
 ): T | undefined {
   if (value === null || value === undefined) {
     return undefined;
   }
 
   if (typeof value === "object" && "path" in value) {
-    return getByPath(dataModel, value.path) as T | undefined;
+    return getByPath(stateModel, value.path) as T | undefined;
   }
 
   return value as T;

@@ -1,30 +1,41 @@
 "use client";
 
-import React, { type ComponentType, type ReactNode, useMemo } from "react";
+import React, {
+  type ComponentType,
+  type ReactNode,
+  useCallback,
+  useMemo,
+} from "react";
 import type {
   UIElement,
   Spec,
-  Action,
+  ActionBinding,
   Catalog,
   SchemaDefinition,
   LegacyCatalog,
   ComponentDefinition,
 } from "@json-render/core";
+import { resolveElementProps, getByPath } from "@json-render/core";
 import type {
   Components,
   Actions,
   ActionFn,
-  SetData,
-  DataModel,
+  SetState,
+  StateModel,
 } from "./catalog-types";
-import { useIsVisible } from "./contexts/visibility";
+import { useIsVisible, useVisibility } from "./contexts/visibility";
 import { useActions } from "./contexts/actions";
-import { useData } from "./contexts/data";
-import { DataProvider } from "./contexts/data";
+import { useStateStore } from "./contexts/state";
+import { StateProvider } from "./contexts/state";
 import { VisibilityProvider } from "./contexts/visibility";
 import { ActionProvider } from "./contexts/actions";
 import { ValidationProvider } from "./contexts/validation";
 import { ConfirmDialog } from "./contexts/actions";
+import {
+  RepeatScopeProvider,
+  useRepeatScope,
+  rewriteRepeatTokens,
+} from "./contexts/repeat-scope";
 
 /**
  * Props passed to component renderers
@@ -34,8 +45,8 @@ export interface ComponentRenderProps<P = Record<string, unknown>> {
   element: UIElement<string, P>;
   /** Rendered children */
   children?: ReactNode;
-  /** Execute an action */
-  onAction?: (action: Action) => void;
+  /** Emit a named event. The renderer resolves the event to action binding(s) from the element's `on` field. */
+  emit?: (event: string) => void;
   /** Whether the parent is loading */
   loading?: boolean;
 }
@@ -82,44 +93,193 @@ function ElementRenderer({
   loading?: boolean;
   fallback?: ComponentRenderer;
 }) {
-  const isVisible = useIsVisible(element.visible);
+  const repeatScope = useRepeatScope();
+  const { ctx } = useVisibility();
   const { execute } = useActions();
+
+  // ---- Rewrite $item / $index tokens when inside a repeat ----
+  let effectiveElement = element;
+  if (repeatScope) {
+    const rewrittenProps = rewriteRepeatTokens(
+      element.props,
+      repeatScope.basePath,
+      repeatScope.index,
+    );
+    const rewrittenVisible =
+      element.visible !== undefined
+        ? rewriteRepeatTokens(
+            element.visible,
+            repeatScope.basePath,
+            repeatScope.index,
+          )
+        : element.visible;
+    const rewrittenOn =
+      element.on !== undefined
+        ? rewriteRepeatTokens(
+            element.on,
+            repeatScope.basePath,
+            repeatScope.index,
+          )
+        : element.on;
+    if (
+      rewrittenProps !== element.props ||
+      rewrittenVisible !== element.visible ||
+      rewrittenOn !== element.on
+    ) {
+      effectiveElement = {
+        ...element,
+        props: rewrittenProps as Record<string, unknown>,
+        visible: rewrittenVisible as UIElement["visible"],
+        on: rewrittenOn as UIElement["on"],
+      };
+    }
+  }
+
+  // Evaluate visibility (after token rewriting so paths are absolute)
+  const isVisible = useIsVisible(effectiveElement.visible);
+
+  // Create emit function that resolves events to action bindings.
+  // Must be called before any early return to satisfy Rules of Hooks.
+  const onBindings = effectiveElement.on;
+  const emit = useCallback(
+    (eventName: string) => {
+      const binding = onBindings?.[eventName];
+      if (!binding) return;
+      const bindings = Array.isArray(binding) ? binding : [binding];
+      for (const b of bindings) {
+        execute(b);
+      }
+    },
+    [onBindings, execute],
+  );
 
   // Don't render if not visible
   if (!isVisible) {
     return null;
   }
 
+  // Resolve dynamic prop expressions ($path, $cond/$then/$else)
+  const resolvedProps = resolveElementProps(
+    effectiveElement.props as Record<string, unknown>,
+    ctx,
+  );
+  const resolvedElement =
+    resolvedProps !== effectiveElement.props
+      ? { ...effectiveElement, props: resolvedProps }
+      : effectiveElement;
+
   // Get the component renderer
-  const Component = registry[element.type] ?? fallback;
+  const Component = registry[resolvedElement.type] ?? fallback;
 
   if (!Component) {
-    console.warn(`No renderer for component type: ${element.type}`);
+    console.warn(`No renderer for component type: ${resolvedElement.type}`);
     return null;
   }
 
-  // Render children
-  const children = element.children?.map((childKey) => {
-    const childElement = spec.elements[childKey];
-    if (!childElement) {
-      return null;
-    }
-    return (
-      <ElementRenderer
-        key={childKey}
-        element={childElement}
-        spec={spec}
-        registry={registry}
-        loading={loading}
-        fallback={fallback}
-      />
-    );
-  });
+  // ---- Render children (with repeat support) ----
+  const children = resolvedElement.repeat ? (
+    <RepeatChildren
+      element={resolvedElement}
+      spec={spec}
+      registry={registry}
+      loading={loading}
+      fallback={fallback}
+    />
+  ) : (
+    resolvedElement.children?.map((childKey) => {
+      const childElement = spec.elements[childKey];
+      if (!childElement) {
+        if (!loading) {
+          console.warn(
+            `[json-render] Missing element "${childKey}" referenced as child of "${resolvedElement.type}". This element will not render.`,
+          );
+        }
+        return null;
+      }
+      return (
+        <ElementRenderer
+          key={childKey}
+          element={childElement}
+          spec={spec}
+          registry={registry}
+          loading={loading}
+          fallback={fallback}
+        />
+      );
+    })
+  );
 
   return (
-    <Component element={element} onAction={execute} loading={loading}>
+    <Component element={resolvedElement} emit={emit} loading={loading}>
       {children}
     </Component>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// RepeatChildren -- renders child elements once per item in a state array.
+// Used when an element has a `repeat` field.
+// ---------------------------------------------------------------------------
+
+function RepeatChildren({
+  element,
+  spec,
+  registry,
+  loading,
+  fallback,
+}: {
+  element: UIElement;
+  spec: Spec;
+  registry: ComponentRegistry;
+  loading?: boolean;
+  fallback?: ComponentRenderer;
+}) {
+  const { state } = useStateStore();
+  const repeat = element.repeat!;
+  const statePath = repeat.path;
+
+  const items = (getByPath(state, statePath) as unknown[] | undefined) ?? [];
+
+  return (
+    <>
+      {items.map((item, index) => {
+        // Use a stable key: prefer key field, fall back to index
+        const key =
+          repeat.key && typeof item === "object" && item !== null
+            ? String((item as Record<string, unknown>)[repeat.key] ?? index)
+            : String(index);
+
+        return (
+          <RepeatScopeProvider
+            key={key}
+            basePath={`${statePath}/${index}`}
+            index={index}
+          >
+            {element.children?.map((childKey) => {
+              const childElement = spec.elements[childKey];
+              if (!childElement) {
+                if (!loading) {
+                  console.warn(
+                    `[json-render] Missing element "${childKey}" referenced as child of "${element.type}" (repeat). This element will not render.`,
+                  );
+                }
+                return null;
+              }
+              return (
+                <ElementRenderer
+                  key={childKey}
+                  element={childElement}
+                  spec={spec}
+                  registry={registry}
+                  loading={loading}
+                  fallback={fallback}
+                />
+              );
+            })}
+          </RepeatScopeProvider>
+        );
+      })}
+    </>
   );
 }
 
@@ -153,8 +313,8 @@ export function Renderer({ spec, registry, loading, fallback }: RendererProps) {
 export interface JSONUIProviderProps {
   /** Component registry */
   registry: ComponentRegistry;
-  /** Initial data model */
-  initialData?: Record<string, unknown>;
+  /** Initial state model */
+  initialState?: Record<string, unknown>;
   /** Auth state */
   authState?: { isSignedIn: boolean; user?: Record<string, unknown> };
   /** Action handlers */
@@ -169,8 +329,8 @@ export interface JSONUIProviderProps {
     string,
     (value: unknown, args?: Record<string, unknown>) => boolean
   >;
-  /** Callback when data changes */
-  onDataChange?: (path: string, value: unknown) => void;
+  /** Callback when state changes */
+  onStateChange?: (path: string, value: unknown) => void;
   children: ReactNode;
 }
 
@@ -179,19 +339,19 @@ export interface JSONUIProviderProps {
  */
 export function JSONUIProvider({
   registry,
-  initialData,
+  initialState,
   authState,
   actionHandlers,
   navigate,
   validationFunctions,
-  onDataChange,
+  onStateChange,
   children,
 }: JSONUIProviderProps) {
   return (
-    <DataProvider
-      initialData={initialData}
+    <StateProvider
+      initialState={initialState}
       authState={authState}
-      onDataChange={onDataChange}
+      onStateChange={onStateChange}
     >
       <VisibilityProvider>
         <ActionProvider handlers={actionHandlers} navigate={navigate}>
@@ -201,7 +361,7 @@ export function JSONUIProvider({
           </ValidationProvider>
         </ActionProvider>
       </VisibilityProvider>
-    </DataProvider>
+    </StateProvider>
   );
 }
 
@@ -251,22 +411,22 @@ export interface DefineRegistryResult {
   registry: ComponentRegistry;
   /**
    * Create ActionProvider-compatible handlers.
-   * Accepts getter functions so handlers always read the latest data/setData
+   * Accepts getter functions so handlers always read the latest state/setState
    * (e.g. from React refs).
    */
   handlers: (
-    getSetData: () => SetData | undefined,
-    getData: () => DataModel,
+    getSetState: () => SetState | undefined,
+    getState: () => StateModel,
   ) => Record<string, (params: Record<string, unknown>) => Promise<void>>;
   /**
    * Execute an action by name imperatively
-   * (for use outside the React tree, e.g. initial data loading).
+   * (for use outside the React tree, e.g. initial state loading).
    */
   executeAction: (
     actionName: string,
     params: Record<string, unknown> | undefined,
-    setData: SetData,
-    data?: DataModel,
+    setState: SetState,
+    state?: StateModel,
   ) => Promise<void>;
 }
 
@@ -287,7 +447,7 @@ export interface DefineRegistryResult {
  * // Actions only
  * const { handlers, executeAction } = defineRegistry(catalog, {
  *   actions: {
- *     viewCustomers: async (params, setData) => { ... },
+ *     viewCustomers: async (params, setState) => { ... },
  *   },
  * });
  *
@@ -312,13 +472,13 @@ export function defineRegistry<C extends Catalog>(
       registry[name] = ({
         element,
         children,
-        onAction,
+        emit,
         loading,
       }: ComponentRenderProps) => {
         return (componentFn as DefineRegistryComponentFn)({
           props: element.props,
           children,
-          onAction,
+          emit,
           loading,
         });
       };
@@ -333,8 +493,8 @@ export function defineRegistry<C extends Catalog>(
     : [];
 
   const handlers = (
-    getSetData: () => SetData | undefined,
-    getData: () => DataModel,
+    getSetState: () => SetState | undefined,
+    getState: () => StateModel,
   ): Record<string, (params: Record<string, unknown>) => Promise<void>> => {
     const result: Record<
       string,
@@ -342,10 +502,10 @@ export function defineRegistry<C extends Catalog>(
     > = {};
     for (const [name, actionFn] of actionMap) {
       result[name] = async (params) => {
-        const setData = getSetData();
-        const data = getData();
-        if (setData) {
-          await actionFn(params, setData, data);
+        const setState = getSetState();
+        const state = getState();
+        if (setState) {
+          await actionFn(params, setState, state);
         }
       };
     }
@@ -355,12 +515,12 @@ export function defineRegistry<C extends Catalog>(
   const executeAction = async (
     actionName: string,
     params: Record<string, unknown> | undefined,
-    setData: SetData,
-    data: DataModel = {},
+    setState: SetState,
+    state: StateModel = {},
   ): Promise<void> => {
     const entry = actionMap.find(([name]) => name === actionName);
     if (entry) {
-      await entry[1](params, setData, data);
+      await entry[1](params, setState, state);
     } else {
       console.warn(`Unknown action: ${actionName}`);
     }
@@ -373,15 +533,15 @@ export function defineRegistry<C extends Catalog>(
 type DefineRegistryComponentFn = (ctx: {
   props: unknown;
   children?: React.ReactNode;
-  onAction?: (action: Action) => void;
+  emit?: (event: string) => void;
   loading?: boolean;
 }) => React.ReactNode;
 
 /** @internal */
 type DefineRegistryActionFn = (
   params: Record<string, unknown> | undefined,
-  setData: SetData,
-  data: DataModel,
+  setState: SetState,
+  state: StateModel,
 ) => Promise<void>;
 
 // ============================================================================
@@ -394,12 +554,12 @@ type DefineRegistryActionFn = (
 export interface CreateRendererProps {
   /** The spec to render (AI-generated JSON) */
   spec: Spec | null;
-  /** Data context for dynamic values */
-  data?: Record<string, unknown>;
+  /** State context for dynamic values */
+  state?: Record<string, unknown>;
   /** Action handler */
   onAction?: (actionName: string, params?: Record<string, unknown>) => void;
-  /** Callback when data changes (e.g., from form inputs) */
-  onDataChange?: (path: string, value: unknown) => void;
+  /** Callback when state changes (e.g., from form inputs) */
+  onStateChange?: (path: string, value: unknown) => void;
   /** Whether the spec is currently loading/streaming */
   loading?: boolean;
   /** Auth state for visibility conditions */
@@ -434,7 +594,7 @@ export type ComponentMap<
  * });
  *
  * // Usage
- * <DashboardRenderer spec={aiGeneratedSpec} data={data} />
+ * <DashboardRenderer spec={aiGeneratedSpec} state={state} />
  * ```
  */
 export function createRenderer<
@@ -451,9 +611,9 @@ export function createRenderer<
   // Return the renderer component
   return function CatalogRenderer({
     spec,
-    data,
+    state,
     onAction,
-    onDataChange,
+    onStateChange,
     loading,
     authState,
     fallback,
@@ -473,10 +633,10 @@ export function createRenderer<
       : undefined;
 
     return (
-      <DataProvider
-        initialData={data}
+      <StateProvider
+        initialState={state}
         authState={authState}
-        onDataChange={onDataChange}
+        onStateChange={onStateChange}
       >
         <VisibilityProvider>
           <ActionProvider handlers={actionHandlers}>
@@ -491,7 +651,7 @@ export function createRenderer<
             </ValidationProvider>
           </ActionProvider>
         </VisibilityProvider>
-      </DataProvider>
+      </StateProvider>
     );
   };
 }

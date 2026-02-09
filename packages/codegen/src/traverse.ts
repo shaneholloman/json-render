@@ -56,9 +56,9 @@ export function collectUsedComponents(spec: Spec): Set<string> {
 }
 
 /**
- * Collect all data paths referenced in a spec
+ * Collect all state paths referenced in a spec
  */
-export function collectDataPaths(spec: Spec): Set<string> {
+export function collectStatePaths(spec: Spec): Set<string> {
   const paths = new Set<string>();
 
   traverseSpec(spec, (element, _key) => {
@@ -69,7 +69,7 @@ export function collectDataPaths(spec: Spec): Set<string> {
         if (
           propName.endsWith("Path") ||
           propName === "bindPath" ||
-          propName === "dataPath"
+          propName === "statePath"
         ) {
           paths.add(propValue);
         }

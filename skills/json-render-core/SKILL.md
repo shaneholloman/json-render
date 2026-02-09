@@ -77,12 +77,70 @@ const { result, newPatches } = compiler.push(chunk);
 const finalSpec = compiler.getResult();
 ```
 
+## Dynamic Prop Expressions
+
+Any prop value can be a dynamic expression resolved at render time:
+
+- **`{ "$path": "/state/key" }`** -- reads a value from the data model
+- **`{ "$cond": <condition>, "$then": <value>, "$else": <value> }`** -- evaluates a visibility condition and picks a branch
+
+`$cond` uses the same syntax as visibility conditions (`eq`, `neq`, `path`, `and`, `or`, `not`). `$then` and `$else` can themselves be expressions (recursive).
+
+```json
+{
+  "color": {
+    "$cond": { "eq": [{ "path": "/activeTab" }, "home"] },
+    "$then": "#007AFF",
+    "$else": "#8E8E93"
+  }
+}
+```
+
+```typescript
+import { resolvePropValue, resolveElementProps } from "@json-render/core";
+
+const resolved = resolveElementProps(element.props, { stateModel: myState });
+```
+
+## User Prompt Builder
+
+Build structured user prompts with optional spec refinement and state context:
+
+```typescript
+import { buildUserPrompt } from "@json-render/core";
+
+// Fresh generation
+buildUserPrompt({ prompt: "create a todo app" });
+
+// Refinement (patch-only mode)
+buildUserPrompt({ prompt: "add a toggle", currentSpec: spec });
+
+// With runtime state
+buildUserPrompt({ prompt: "show data", state: { todos: [] } });
+```
+
+## Spec Validation
+
+Validate spec structure and auto-fix common issues:
+
+```typescript
+import { validateSpec, autoFixSpec } from "@json-render/core";
+
+const { valid, issues } = validateSpec(spec, catalog);
+const fixed = autoFixSpec(spec);
+```
+
 ## Key Exports
 
 | Export | Purpose |
 |--------|---------|
 | `defineSchema` | Create a new schema |
 | `defineCatalog` | Create a catalog from schema |
+| `resolvePropValue` | Resolve a single prop expression against data |
+| `resolveElementProps` | Resolve all prop expressions in an element |
+| `buildUserPrompt` | Build user prompts with refinement and state context |
+| `validateSpec` | Validate spec structure |
+| `autoFixSpec` | Auto-fix common spec issues |
 | `createSpecStreamCompiler` | Stream JSONL patches into spec |
 | `parseSpecStreamLine` | Parse single JSONL line |
 | `applySpecStreamPatch` | Apply patch to object |

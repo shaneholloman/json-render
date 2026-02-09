@@ -1,12 +1,12 @@
 // Contexts
 export {
-  DataProvider,
-  useData,
-  useDataValue,
-  useDataBinding,
-  type DataContextValue,
-  type DataProviderProps,
-} from "./contexts/data";
+  StateProvider,
+  useStateStore,
+  useStateValue,
+  useStateBinding,
+  type StateContextValue,
+  type StateProviderProps,
+} from "./contexts/state";
 
 export {
   VisibilityProvider,
@@ -36,6 +36,13 @@ export {
   type FieldValidationState,
 } from "./contexts/validation";
 
+export {
+  RepeatScopeProvider,
+  useRepeatScope,
+  rewriteRepeatTokens,
+  type RepeatScopeValue,
+} from "./contexts/repeat-scope";
+
 // Schema (React's spec format)
 export {
   schema,
@@ -52,9 +59,8 @@ export type { Spec } from "@json-render/core";
 
 // Catalog-aware types for React
 export type {
-  SetData,
-  DataModel,
-  ActionTrigger,
+  SetState,
+  StateModel,
   ComponentContext,
   ComponentFn,
   Components,
@@ -88,4 +94,5 @@ export {
   flatToTree,
   type UseUIStreamOptions,
   type UseUIStreamReturn,
+  type TokenUsage,
 } from "./hooks";

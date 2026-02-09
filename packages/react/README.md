@@ -51,7 +51,7 @@ export const catalog = defineCatalog(schema, {
 ### 2. Define Component Implementations
 
 ```tsx
-import { defineRegistry, useData } from "@json-render/react";
+import { defineRegistry, useStateStore } from "@json-render/react";
 import { catalog } from "./catalog";
 
 export const { registry } = defineRegistry(catalog, {
@@ -69,7 +69,7 @@ export const { registry } = defineRegistry(catalog, {
       </button>
     ),
     Input: ({ props }) => {
-      const { get, set } = useData();
+      const { get, set } = useStateStore();
       return (
         <label>
           {props.label}
@@ -88,18 +88,18 @@ export const { registry } = defineRegistry(catalog, {
 ### 3. Render Specs
 
 ```tsx
-import { Renderer, DataProvider, ActionProvider } from "@json-render/react";
+import { Renderer, StateProvider, ActionProvider } from "@json-render/react";
 import { registry } from "./registry";
 
 function App({ spec }) {
   return (
-    <DataProvider initialData={{ form: { value: "" } }}>
+    <StateProvider initialState={{ form: { value: "" } }}>
       <ActionProvider handlers={{
         submit: () => console.log("Submit"),
       }}>
         <Renderer spec={spec} registry={registry} />
       </ActionProvider>
-    </DataProvider>
+    </StateProvider>
   );
 }
 ```
@@ -144,17 +144,17 @@ Example spec:
 
 ## Contexts
 
-### DataProvider
+### StateProvider
 
 Share data across components with JSON Pointer paths:
 
 ```tsx
-<DataProvider initialData={{ user: { name: "John" } }}>
+<StateProvider initialState={{ user: { name: "John" } }}>
   {children}
-</DataProvider>
+</StateProvider>
 
 // In components:
-const { data, get, set } = useData();
+const { data, get, set } = useStateStore();
 const name = get("/user/name");  // "John"
 set("/user/age", 25);
 ```
@@ -213,12 +213,15 @@ const { errors, validate } = useFieldValidation("/form/email", {
 
 | Hook | Purpose |
 |------|---------|
-| `useData()` | Access data context (`data`, `get`, `set`) |
-| `useDataValue(path)` | Get single value from data |
+| `useStateStore()` | Access data context (`data`, `get`, `set`) |
+| `useStateValue(path)` | Get single value from data |
+| `useStateBinding(path)` | Two-way data binding (returns `[value, setValue]`) |
 | `useVisibility()` | Access visibility evaluation |
 | `useIsVisible(condition)` | Check if condition is met |
 | `useActions()` | Access action context |
+| `useAction(name)` | Get a single action dispatch function |
 | `useFieldValidation(path, config)` | Field validation state |
+| `useUIStream(options)` | Stream specs from an API endpoint |
 
 ## Visibility Conditions
 
@@ -246,6 +249,41 @@ const { errors, validate } = useFieldValidation("/form/email", {
     { "path": "/user/isAdmin" },
     { "path": "/user/isModerator" }
   ]
+}
+```
+
+## Dynamic Prop Expressions
+
+Any prop value can use data-driven expressions that resolve at render time. The renderer resolves these transparently before passing props to components.
+
+```json
+{
+  "type": "Badge",
+  "props": {
+    "label": { "$path": "/user/role" },
+    "color": {
+      "$cond": { "eq": [{ "path": "/user/role" }, "admin"] },
+      "$then": "red",
+      "$else": "gray"
+    }
+  }
+}
+```
+
+See [@json-render/core](../core/README.md) for full expression syntax.
+
+## Built-in Actions
+
+The `setState` action is handled automatically by `ActionProvider`. It updates the data model, which triggers re-evaluation of visibility conditions and dynamic prop expressions:
+
+```json
+{
+  "type": "Button",
+  "props": {
+    "label": "Switch Tab",
+    "action": "setState",
+    "actionParams": { "path": "/activeTab", "value": "settings" }
+  }
 }
 ```
 

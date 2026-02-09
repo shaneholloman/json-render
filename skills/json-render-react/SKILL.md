@@ -80,14 +80,41 @@ The React schema uses an element tree format:
 }
 ```
 
-## Contexts
+## Providers
 
-| Context | Purpose |
-|---------|---------|
-| `DataContext` | Provide data for binding (`{{path.to.value}}`) |
-| `ActionsContext` | Provide action handlers |
-| `ValidationContext` | Form validation state |
-| `VisibilityContext` | Conditional rendering |
+| Provider | Purpose |
+|----------|---------|
+| `StateProvider` | Share state across components (JSON Pointer paths) |
+| `ActionProvider` | Handle actions dispatched from components |
+| `VisibilityProvider` | Enable conditional rendering based on state |
+| `ValidationProvider` | Form field validation |
+
+## Dynamic Prop Expressions
+
+Any prop value can be a data-driven expression resolved by the renderer before components receive props:
+
+- **`{ "$path": "/state/key" }`** -- reads from data model
+- **`{ "$cond": <condition>, "$then": <value>, "$else": <value> }`** -- conditional value
+
+```json
+{
+  "color": {
+    "$cond": { "eq": [{ "path": "/status" }, "active"] },
+    "$then": "green",
+    "$else": "gray"
+  }
+}
+```
+
+Components receive already-resolved props -- no changes needed to component implementations.
+
+## Built-in Actions
+
+The `setState` action is handled automatically by `ActionProvider` and updates the data model directly, which re-evaluates visibility conditions and dynamic prop expressions:
+
+```json
+{ "action": "setState", "actionParams": { "path": "/activeTab", "value": "home" } }
+```
 
 ## Key Exports
 
@@ -96,5 +123,9 @@ The React schema uses an element tree format:
 | `defineRegistry` | Create a type-safe component registry from a catalog |
 | `Renderer` | Render a spec using a registry |
 | `schema` | Element tree schema |
-| `useData` | Access data context |
+| `useStateStore` | Access data context |
+| `useStateValue` | Get single value from data |
+| `useStateBinding` | Two-way data binding |
 | `useActions` | Access actions context |
+| `useAction` | Get a single action dispatch function |
+| `useUIStream` | Stream specs from an API endpoint |

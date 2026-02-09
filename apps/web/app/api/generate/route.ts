@@ -1,15 +1,19 @@
 import { streamText } from "ai";
 import { headers } from "next/headers";
+import { buildUserPrompt } from "@json-render/core";
 import { minuteRateLimit, dailyRateLimit } from "@/lib/rate-limit";
-import { playgroundCatalog } from "@/lib/catalog";
+import { playgroundCatalog } from "@/lib/render/catalog";
 
 export const maxDuration = 30;
 
 const SYSTEM_PROMPT = playgroundCatalog.prompt({
   customRules: [
-    "For forms: Card should be the root element, not wrapped in a centering Stack",
-    "NEVER use viewport height classes (min-h-screen, h-screen) - breaks the container",
-    "NEVER use page background colors (bg-gray-50) - container has its own background",
+    "NEVER use viewport height classes (min-h-screen, h-screen) - the UI renders inside a fixed-size container.",
+    "NEVER use page background colors (bg-gray-50) - the container has its own background.",
+    "For forms or small UIs: use Card as root with maxWidth:'sm' or 'md' and centered:true.",
+    "For content-heavy UIs (blogs, dashboards, product listings): use Stack or Grid as root. Use Grid with 2-3 columns for card layouts.",
+    "Wrap each repeated item in a Card for visual separation and structure.",
+    "Use realistic, professional sample data. Include 3-5 items with varied content. Never leave state arrays empty.",
   ],
 });
 
@@ -44,31 +48,12 @@ export async function POST(req: Request) {
   }
 
   const { prompt, context } = await req.json();
-  const previousSpec = context?.previousSpec;
 
-  const sanitizedPrompt = String(prompt || "").slice(0, MAX_PROMPT_LENGTH);
-
-  // Build the user prompt, including previous tree for iteration
-  let userPrompt = sanitizedPrompt;
-  if (
-    previousSpec &&
-    previousSpec.root &&
-    Object.keys(previousSpec.elements || {}).length > 0
-  ) {
-    userPrompt = `CURRENT UI STATE (already loaded, DO NOT recreate existing elements):
-${JSON.stringify(previousSpec, null, 2)}
-
-USER REQUEST: ${sanitizedPrompt}
-
-IMPORTANT: The current UI is already loaded. Output ONLY the patches needed to make the requested change:
-- To add a new element: {"op":"add","path":"/elements/new-key","value":{...}}
-- To modify an existing element: {"op":"replace","path":"/elements/existing-key","value":{...}}
-- To remove an element: {"op":"remove","path":"/elements/old-key"}
-- To update the root: {"op":"replace","path":"/root","value":"new-root-key"}
-- To add children: update the parent element with new children array
-
-DO NOT output patches for elements that don't need to change. Only output what's necessary for the requested modification.`;
-  }
+  const userPrompt = buildUserPrompt({
+    prompt,
+    currentSpec: context?.previousSpec,
+    maxPromptLength: MAX_PROMPT_LENGTH,
+  });
 
   const result = streamText({
     model: process.env.AI_GATEWAY_MODEL || DEFAULT_MODEL,
@@ -77,5 +62,33 @@ DO NOT output patches for elements that don't need to change. Only output what's
     temperature: 0.7,
   });
 
-  return result.toTextStreamResponse();
+  // Stream the text, then append token usage metadata at the end
+  const encoder = new TextEncoder();
+  const textStream = result.textStream;
+
+  const stream = new ReadableStream({
+    async start(controller) {
+      for await (const chunk of textStream) {
+        controller.enqueue(encoder.encode(chunk));
+      }
+      // Append usage metadata after stream completes
+      try {
+        const usage = await result.usage;
+        const meta = JSON.stringify({
+          __meta: "usage",
+          promptTokens: usage.inputTokens,
+          completionTokens: usage.outputTokens,
+          totalTokens: usage.totalTokens,
+        });
+        controller.enqueue(encoder.encode(`\n${meta}\n`));
+      } catch {
+        // Usage not available -- skip silently
+      }
+      controller.close();
+    },
+  });
+
+  return new Response(stream, {
+    headers: { "Content-Type": "text/plain; charset=utf-8" },
+  });
 }

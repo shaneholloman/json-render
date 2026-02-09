@@ -15,15 +15,46 @@ import {
 } from "@json-render/core";
 
 /**
- * Parse a single JSON patch line
+ * Token usage metadata from AI generation
  */
-function parsePatchLine(line: string): JsonPatch | null {
+export interface TokenUsage {
+  promptTokens: number;
+  completionTokens: number;
+  totalTokens: number;
+}
+
+/**
+ * Parse result for a single line -- either a patch or usage metadata
+ */
+type ParsedLine =
+  | { type: "patch"; patch: JsonPatch }
+  | { type: "usage"; usage: TokenUsage }
+  | null;
+
+/**
+ * Parse a single JSON line (patch or metadata)
+ */
+function parseLine(line: string): ParsedLine {
   try {
     const trimmed = line.trim();
     if (!trimmed || trimmed.startsWith("//")) {
       return null;
     }
-    return JSON.parse(trimmed) as JsonPatch;
+    const parsed = JSON.parse(trimmed);
+
+    // Check for usage metadata
+    if (parsed.__meta === "usage") {
+      return {
+        type: "usage",
+        usage: {
+          promptTokens: parsed.promptTokens ?? 0,
+          completionTokens: parsed.completionTokens ?? 0,
+          totalTokens: parsed.totalTokens ?? 0,
+        },
+      };
+    }
+
+    return { type: "patch", patch: parsed as JsonPatch };
   } catch {
     return null;
   }
@@ -35,6 +66,18 @@ function parsePatchLine(line: string): JsonPatch | null {
 function setSpecValue(newSpec: Spec, path: string, value: unknown): void {
   if (path === "/root") {
     newSpec.root = value as string;
+    return;
+  }
+
+  if (path === "/state") {
+    newSpec.state = value as Record<string, unknown>;
+    return;
+  }
+
+  if (path.startsWith("/state/")) {
+    if (!newSpec.state) newSpec.state = {};
+    const statePath = path.slice("/state".length); // e.g. "/posts"
+    setByPath(newSpec.state as Record<string, unknown>, statePath, value);
     return;
   }
 
@@ -65,6 +108,17 @@ function setSpecValue(newSpec: Spec, path: string, value: unknown): void {
  * Remove a value at a spec path.
  */
 function removeSpecValue(newSpec: Spec, path: string): void {
+  if (path === "/state") {
+    delete newSpec.state;
+    return;
+  }
+
+  if (path.startsWith("/state/") && newSpec.state) {
+    const statePath = path.slice("/state".length);
+    removeByPath(newSpec.state as Record<string, unknown>, statePath);
+    return;
+  }
+
   if (path.startsWith("/elements/")) {
     const pathParts = path.slice("/elements/".length).split("/");
     const elementKey = pathParts[0];
@@ -93,6 +147,11 @@ function removeSpecValue(newSpec: Spec, path: string): void {
  */
 function getSpecValue(spec: Spec, path: string): unknown {
   if (path === "/root") return spec.root;
+  if (path === "/state") return spec.state;
+  if (path.startsWith("/state/") && spec.state) {
+    const statePath = path.slice("/state".length);
+    return getByPath(spec.state as Record<string, unknown>, statePath);
+  }
   return getByPath(spec as unknown as Record<string, unknown>, path);
 }
 
@@ -101,7 +160,11 @@ function getSpecValue(spec: Spec, path: string): unknown {
  * Supports add, remove, replace, move, copy, and test operations.
  */
 function applyPatch(spec: Spec, patch: JsonPatch): Spec {
-  const newSpec = { ...spec, elements: { ...spec.elements } };
+  const newSpec = {
+    ...spec,
+    elements: { ...spec.elements },
+    ...(spec.state ? { state: { ...spec.state } } : {}),
+  };
 
   switch (patch.op) {
     case "add":
@@ -157,6 +220,10 @@ export interface UseUIStreamReturn {
   isStreaming: boolean;
   /** Error if any */
   error: Error | null;
+  /** Token usage from the last generation */
+  usage: TokenUsage | null;
+  /** Raw JSONL lines received from the stream (JSON patch lines) */
+  rawLines: string[];
   /** Send a prompt to generate UI */
   send: (prompt: string, context?: Record<string, unknown>) => Promise<void>;
   /** Clear the current spec */
@@ -174,6 +241,8 @@ export function useUIStream({
   const [spec, setSpec] = useState<Spec | null>(null);
   const [isStreaming, setIsStreaming] = useState(false);
   const [error, setError] = useState<Error | null>(null);
+  const [usage, setUsage] = useState<TokenUsage | null>(null);
+  const [rawLines, setRawLines] = useState<string[]>([]);
   const abortControllerRef = useRef<AbortController | null>(null);
 
   const clear = useCallback(() => {
@@ -189,6 +258,8 @@ export function useUIStream({
 
       setIsStreaming(true);
       setError(null);
+      setUsage(null);
+      setRawLines([]);
 
       // Start with previous spec if provided, otherwise empty spec
       const previousSpec = context?.previousSpec as Spec | undefined;
@@ -245,9 +316,15 @@ export function useUIStream({
           buffer = lines.pop() ?? "";
 
           for (const line of lines) {
-            const patch = parsePatchLine(line);
-            if (patch) {
-              currentSpec = applyPatch(currentSpec, patch);
+            const trimmed = line.trim();
+            if (!trimmed) continue;
+            const result = parseLine(trimmed);
+            if (!result) continue;
+            if (result.type === "usage") {
+              setUsage(result.usage);
+            } else {
+              setRawLines((prev) => [...prev, trimmed]);
+              currentSpec = applyPatch(currentSpec, result.patch);
               setSpec({ ...currentSpec });
             }
           }
@@ -255,10 +332,16 @@ export function useUIStream({
 
         // Process any remaining buffer
         if (buffer.trim()) {
-          const patch = parsePatchLine(buffer);
-          if (patch) {
-            currentSpec = applyPatch(currentSpec, patch);
-            setSpec({ ...currentSpec });
+          const trimmed = buffer.trim();
+          const result = parseLine(trimmed);
+          if (result) {
+            if (result.type === "usage") {
+              setUsage(result.usage);
+            } else {
+              setRawLines((prev) => [...prev, trimmed]);
+              currentSpec = applyPatch(currentSpec, result.patch);
+              setSpec({ ...currentSpec });
+            }
           }
         }
 
@@ -288,6 +371,8 @@ export function useUIStream({
     spec,
     isStreaming,
     error,
+    usage,
+    rawLines,
     send,
     clear,
   };

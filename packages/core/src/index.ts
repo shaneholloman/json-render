@@ -10,7 +10,7 @@ export type {
   VisibilityCondition,
   LogicExpression,
   AuthState,
-  DataModel,
+  StateModel,
   ComponentSchema,
   ValidationMode,
   PatchOp,
@@ -49,8 +49,15 @@ export {
   visibility,
 } from "./visibility";
 
+// Prop Expressions
+export type { PropExpression } from "./props";
+
+export { resolvePropValue, resolveElementProps } from "./props";
+
 // Actions
 export type {
+  ActionBinding,
+  /** @deprecated Use ActionBinding instead */
   Action,
   ActionConfirm,
   ActionOnSuccess,
@@ -62,6 +69,8 @@ export type {
 } from "./actions";
 
 export {
+  ActionBindingSchema,
+  /** @deprecated Use ActionBindingSchema instead */
   ActionSchema,
   ActionConfirmSchema,
   ActionOnSuccessSchema,
@@ -69,6 +78,8 @@ export {
   resolveAction,
   executeAction,
   interpolateString,
+  actionBinding,
+  /** @deprecated Use actionBinding instead */
   action,
 } from "./actions";
 
@@ -92,6 +103,16 @@ export {
   check,
 } from "./validation";
 
+// Spec Structural Validation
+export type {
+  SpecIssueSeverity,
+  SpecIssue,
+  SpecValidationIssues,
+  ValidateSpecOptions,
+} from "./spec-validator";
+
+export { validateSpec, autoFixSpec, formatSpecIssues } from "./spec-validator";
+
 // Schema (new API)
 export type {
   SchemaBuilder,
@@ -114,6 +135,11 @@ export type {
 } from "./schema";
 
 export { defineSchema, defineCatalog } from "./schema";
+
+// User Prompt Builder
+export type { UserPromptOptions } from "./prompt";
+
+export { buildUserPrompt } from "./prompt";
 
 // Legacy Catalog (for backwards compatibility during migration)
 export type {

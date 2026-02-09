@@ -8,38 +8,30 @@ import type {
 } from "@json-render/core";
 
 // =============================================================================
-// Data Types
+// State Types
 // =============================================================================
 
 /**
- * Data setter function for updating application state
+ * State setter function for updating application state
  */
-export type SetData = (
+export type SetState = (
   updater: (prev: Record<string, unknown>) => Record<string, unknown>,
 ) => void;
 
 /**
- * Data model type (generic record)
+ * State model type (generic record)
  */
-export type DataModel = Record<string, unknown>;
+export type StateModel = Record<string, unknown>;
 
 // =============================================================================
 // Component Types
 // =============================================================================
 
 /**
- * Action trigger for component callbacks
- */
-export interface ActionTrigger {
-  name: string;
-  params?: Record<string, unknown>;
-}
-
-/**
  * Context passed to component render functions
  * @example
  * const Button: ComponentFn<typeof catalog, 'Button'> = (ctx) => {
- *   return <button onClick={() => ctx.onAction?.({ name: ctx.props.action })}>{ctx.props.label}</button>
+ *   return <button onClick={() => ctx.emit?.("press")}>{ctx.props.label}</button>
  * }
  */
 export interface ComponentContext<
@@ -48,15 +40,16 @@ export interface ComponentContext<
 > {
   props: InferComponentProps<C, K>;
   children?: ReactNode;
-  onAction?: (action: ActionTrigger) => void;
+  /** Emit a named event. The renderer resolves the event to an action binding from the element's `on` field. */
+  emit?: (event: string) => void;
   loading?: boolean;
 }
 
 /**
  * Component render function type for React
  * @example
- * const Button: ComponentFn<typeof catalog, 'Button'> = ({ props, onAction }) => (
- *   <button onClick={() => onAction?.({ name: props.action })}>{props.label}</button>
+ * const Button: ComponentFn<typeof catalog, 'Button'> = ({ props, emit }) => (
+ *   <button onClick={() => emit?.("press")}>{props.label}</button>
  * );
  */
 export type ComponentFn<
@@ -83,9 +76,9 @@ export type Components<C extends Catalog> = {
 /**
  * Action handler function type
  * @example
- * const viewCustomers: ActionFn<typeof catalog, 'viewCustomers'> = async (params, setData) => {
+ * const viewCustomers: ActionFn<typeof catalog, 'viewCustomers'> = async (params, setState) => {
  *   const data = await fetch('/api/customers');
- *   setData(prev => ({ ...prev, customers: data }));
+ *   setState(prev => ({ ...prev, customers: data }));
  * };
  */
 export type ActionFn<
@@ -93,16 +86,16 @@ export type ActionFn<
   K extends keyof InferCatalogActions<C>,
 > = (
   params: InferActionParams<C, K> | undefined,
-  setData: SetData,
-  data: DataModel,
+  setState: SetState,
+  state: StateModel,
 ) => Promise<void>;
 
 /**
  * Registry of all action handlers for a catalog
  * @example
  * const actions: Actions<typeof myCatalog> = {
- *   viewCustomers: async (params, setData) => { ... },
- *   createCustomer: async (params, setData) => { ... },
+ *   viewCustomers: async (params, setState) => { ... },
+ *   createCustomer: async (params, setState) => { ... },
  * };
  */
 export type Actions<C extends Catalog> = {

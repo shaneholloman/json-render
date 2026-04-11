@@ -319,6 +319,32 @@ export const threeComponentDefinitions = {
     },
   },
 
+  ExtrudedText: {
+    props: z.object({
+      ...transformProps,
+      ...shadowProps,
+      material: materialSchema.nullable(),
+      text: z.string(),
+      font: z.string().nullable(),
+      size: z.number().nullable(),
+      depth: z.number().nullable(),
+      curveSegments: z.number().nullable(),
+      bevelEnabled: z.boolean().nullable(),
+      bevelThickness: z.number().nullable(),
+      bevelSize: z.number().nullable(),
+      bevelSegments: z.number().nullable(),
+      centered: z.boolean().nullable(),
+    }),
+    description:
+      "Extruded 3D text with depth. Uses a typeface JSON font for geometry-based rendering with bevel support.",
+    example: {
+      text: "Hello",
+      size: 1,
+      depth: 0.2,
+      position: [0, 2, 0],
+    },
+  },
+
   // ===========================================================================
   // Effects / Atmosphere
   // ===========================================================================
@@ -815,6 +841,27 @@ export const threeComponentDefinitions = {
     description:
       "Orbit camera controls. Allows the user to rotate, zoom, and pan around the scene.",
     example: { enableDamping: true, autoRotate: false },
+  },
+
+  // ===========================================================================
+  // Gaussian Splatting
+  // ===========================================================================
+
+  GaussianSplat: {
+    props: z.object({
+      src: z.string(),
+      ...transformProps,
+      ...shadowProps,
+      alphaHash: z.boolean().nullable(),
+      toneMapped: z.boolean().nullable(),
+      visible: z.boolean().nullable(),
+    }),
+    description:
+      "Loads and renders a .splat or .ply gaussian splat file inside an R3F scene. Composable with all other 3D components (lights, models, primitives). Uses drei's Splat loader.",
+    example: {
+      src: "https://huggingface.co/datasets/dylanebert/3dgs/resolve/main/bonsai/bonsai-7k.splat",
+      position: [0, 0, 0],
+    },
   },
 };
 

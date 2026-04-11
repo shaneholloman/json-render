@@ -6,7 +6,10 @@ import {
   OrbitControls as DreiOrbitControls,
   PerspectiveCamera as DreiPerspectiveCamera,
   Text as DreiText,
+  Text3D as DreiText3D,
+  Center as DreiCenter,
   Gltf,
+  Splat as DreiSplat,
   Sparkles as DreiSparkles,
   Stars as DreiStars,
   Sky as DreiSky,
@@ -349,6 +352,41 @@ export const threeComponents = {
       {props.text}
     </DreiText>
   ),
+
+  ExtrudedText: ({ props }: BaseComponentProps<ThreeProps<"ExtrudedText">>) => {
+    const font =
+      props.font ??
+      "https://cdn.jsdelivr.net/npm/three/examples/fonts/helvetiker_regular.typeface.json";
+    const inner = (
+      <DreiText3D
+        font={font}
+        size={props.size ?? 1}
+        height={props.depth ?? 0.2}
+        curveSegments={props.curveSegments ?? 12}
+        bevelEnabled={props.bevelEnabled ?? false}
+        bevelThickness={props.bevelThickness ?? 0.02}
+        bevelSize={props.bevelSize ?? 0.02}
+        bevelSegments={props.bevelSegments ?? 3}
+        castShadow={props.castShadow ?? false}
+        receiveShadow={props.receiveShadow ?? false}
+      >
+        {props.text}
+        <MaterialComponent material={props.material} />
+      </DreiText3D>
+    );
+
+    return (
+      <Suspense fallback={null}>
+        <group
+          position={pos(props.position)}
+          rotation={rot(props.rotation)}
+          scale={scl(props.scale)}
+        >
+          {(props.centered ?? true) ? <DreiCenter>{inner}</DreiCenter> : inner}
+        </group>
+      </Suspense>
+    );
+  },
 
   // ── Effects / Atmosphere ──────────────────────────────────────────────
 
@@ -905,5 +943,25 @@ export const threeComponents = {
       autoRotateSpeed={props.autoRotateSpeed ?? 2}
       target={props.target ?? undefined}
     />
+  ),
+
+  // ── Gaussian Splatting ──────────────────────────────────────────────
+
+  GaussianSplat: ({
+    props,
+  }: BaseComponentProps<ThreeProps<"GaussianSplat">>) => (
+    <Suspense fallback={null}>
+      <DreiSplat
+        src={props.src}
+        position={pos(props.position)}
+        rotation={rot(props.rotation)}
+        scale={scl(props.scale)}
+        castShadow={props.castShadow ?? false}
+        receiveShadow={props.receiveShadow ?? false}
+        alphaHash={props.alphaHash ?? undefined}
+        toneMapped={props.toneMapped ?? undefined}
+        visible={props.visible ?? true}
+      />
+    </Suspense>
   ),
 };
